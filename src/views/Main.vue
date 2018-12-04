@@ -44,6 +44,7 @@ export default {
   }
   #nav {
     position: fixed;
+    z-index: 1002;
     width: 100%;
     height: 60px;
     box-sizing: border-box;

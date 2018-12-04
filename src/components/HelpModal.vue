@@ -1,5 +1,5 @@
 <template>
-    <el-dialog title="帮助" width="600px" :visible.sync="show">
+    <el-dialog :title="$t('modal.help')" width="600px" :visible.sync="show">
         <div>帮助</div>
     </el-dialog>
 </template>
@@ -8,7 +8,7 @@
 export default {
     data() {
         return {
-            show: true
+            show: false
         }
     },
     methods: {

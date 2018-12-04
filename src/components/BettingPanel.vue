@@ -2,7 +2,7 @@
     <div class="betting-wrap">
         <div class="betting-panel">
             <div class="bp-tab">
-                <div class="bp-tab-item" v-for="(item, index) in tab.navs" :key="item.name" :class="{active: index === tab.current}" @click="switchTab(index)">{{item.title}}</div>
+                <div class="bp-tab-item" v-for="(item, index) in tab.navs" :key="item.name" :class="{active: index === tab.current}" @click="switchTab(index)">{{$t(item.text)}}</div>
             </div>
             <div class="bp-content">
                 <component :is="tab.navs[tab.current].component"></component>
@@ -26,12 +26,12 @@ export default {
                 current: 0,
                 navs: [
                     {
-                        title: '所有投注',
-                        component: 'AllBets'
+                        component: 'AllBets',
+                        text: 'tab.allBets'
                     },
                     {
-                        title: '我的投注',
-                        component: 'MineBets'
+                        component: 'MineBets',
+                        text: 'tab.mineBets'
                     }
                 ]
             }

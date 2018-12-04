@@ -4,7 +4,7 @@
             <div class="dice-amount">
                 <el-row :gutter="20">
                     <el-col :span="16">
-                        <div class="dice-atr-title">投注金额(EOS)</div>
+                        <div class="dice-atr-title">{{$t('game.betting')}}(EOS)</div>
                         <div class="">
                             <el-row>
                                 <el-col :span="12">
@@ -21,7 +21,7 @@
                         </div>
                     </el-col>
                     <el-col :span="8">
-                        <div class="dice-atr-title">赢取奖金(EOS)</div>
+                        <div class="dice-atr-title">{{$t('game.obtain')}}(EOS)</div>
                         <div class="dice-bonus">212.00</div>
                     </el-col>
                 </el-row>
@@ -30,19 +30,19 @@
                 <el-row :gutter="20">
                     <el-col :span="8">
                         <div>
-                            <div class="dice-atr-title">小于该数获胜</div>
+                            <div class="dice-atr-title">{{$t('game.victoryCondition')}}</div>
                             <span class="dice-count">{{target}}<i class="el-icon-caret-bottom" style="color:red"></i></span>
                         </div>
                     </el-col>
                     <el-col :span="8">
                         <div>
-                            <div class="dice-atr-title">赔率</div>
+                            <div class="dice-atr-title">{{$t('game.odds')}}</div>
                             <span class="dice-count">1.63X</span>
                         </div>
                     </el-col>
                     <el-col :span="8">
                         <div>
-                            <div class="dice-atr-title">中奖概率</div>
+                            <div class="dice-atr-title">{{$t('game.probability')}}</div>
                             <span class="dice-count">{{target - 1}}%</span>
                         </div>
                     </el-col>
@@ -50,6 +50,9 @@
             </div>
             <div class="dice-slide">
                 <el-slider v-model="target" :max="95" :min="4" height="20"></el-slider>
+            </div>
+            <div class="dice-user">
+                <el-button type="primary">{{$t("btn.login")}}</el-button>
             </div>
         </div>
     </div>
@@ -62,6 +65,8 @@ export default {
             bettingNumber: 0,
             target: 50,
         }
+    },
+    methods: {
     }
 }
 </script>
@@ -141,5 +146,9 @@ export default {
 // 滑动条
 .dice-slide {
     padding-top: 30px;
+}
+.dice-user {
+    padding: 10px 0;
+    text-align: center;
 }
 </style>

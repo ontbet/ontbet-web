@@ -1,21 +1,21 @@
 <template>
     <div class="nav-header">
         <div class="logo">
-            <img src="https://www.betdice.one/img/logo.png" alt="LOGO">
+            <img :src="logo" alt="LOGO">
         </div>
         <div></div>
         <ul class="nav-menu">
-            <li class="nav-menu-item active">骰子</li>
-            <li class="nav-menu-item" @click="openModal('dividend')">股息</li>
-            <li class="nav-menu-item" @click="openModal('help')">帮助</li>
+            <li class="nav-menu-item active">{{$t('nav.disc')}}</li>
+            <li class="nav-menu-item" @click="openModal('dividend')">{{$t('nav.dividend')}}</li>
+            <li class="nav-menu-item" @click="openModal('help')">{{$t('nav.help')}}</li>
         </ul>
         <el-dropdown>
             <span class="language-btn">
-                中文<i class="el-icon-arrow-down el-icon--right"></i>
+                {{$t('lang')}}<i class="el-icon-arrow-down el-icon--right"></i>
             </span>
             <el-dropdown-menu slot="dropdown">
-                <el-dropdown-item>中文</el-dropdown-item>
-                <el-dropdown-item>English</el-dropdown-item>
+                <el-dropdown-item @click.native="changeLang('zh')">中文</el-dropdown-item>
+                <el-dropdown-item @click.native="changeLang('en')">English</el-dropdown-item>
             </el-dropdown-menu>
         </el-dropdown>
     </div>
@@ -23,9 +23,18 @@
 
 <script>
 export default {
+    data() {
+        return {
+            logo: require('../assets/iamges/logo3.png')
+        }
+    },
     methods: {
         openModal(type) {
             this.$emit('open-modal', type)
+        },
+        changeLang(lang) {
+            this.$i18n.locale = lang;
+            window.localStorage.setItem("locale", lang);
         }
     }
 }

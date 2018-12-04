@@ -1,5 +1,5 @@
 <template>
-    <el-dialog title="股息" width="600px" :visible.sync="show">
+    <el-dialog :title="$t('modal.dividend')" width="600px" :visible.sync="show">
         <div>股息</div>
     </el-dialog>
 </template>
