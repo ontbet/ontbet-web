@@ -5,6 +5,9 @@ import ElementUI from 'element-ui';
 import 'element-ui/lib/theme-chalk/index.css';
 import store from './store'
 import router from './router'
+import { client } from 'ontology-dapi';
+
+client.registerClient({});
 
 Vue.config.productionTip = false
 

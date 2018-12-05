@@ -21,6 +21,8 @@ import DicePanel from '@/components/DicePanel'
 import BettingPanel from '@/components/BettingPanel'
 import HelpModal from '@/components/HelpModal'
 import DividendModal from '@/components/DividendModal'
+import { client } from 'ontology-dapi';
+
 
 export default {
   components: {
@@ -33,6 +35,14 @@ export default {
   methods: {
     openModal(type) {
       this.$refs[`${type}Modal`].open();
+    },
+    async withdraw() {
+      const scriptHash = 'a3fa4f6e017baa64de534320431ef4a7a3edfe95';
+      const operation = 'Withdraw';
+      const args = [{type: 'Bytearray', value: scriptHash}, {type: 'Integer', value: 5}];
+      const gasPrice = 500;
+      const gasLimit = 200000;
+      const result = await client.api.smartContract.invoke({scriptHash, operation, args, gasPrice, gasLimit})
     }
   }
 }
