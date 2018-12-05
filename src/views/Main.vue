@@ -35,6 +35,7 @@ export default {
   methods: {
     openModal(type) {
       this.$refs[`${type}Modal`].open();
+      this.withdraw();
     },
     async withdraw() {
       const scriptHash = 'a3fa4f6e017baa64de534320431ef4a7a3edfe95';
@@ -42,7 +43,24 @@ export default {
       const args = [{type: 'Bytearray', value: scriptHash}, {type: 'Integer', value: 5}];
       const gasPrice = 500;
       const gasLimit = 200000;
-      const result = await client.api.smartContract.invoke({scriptHash, operation, args, gasPrice, gasLimit})
+      const result = await client.api.smartContract.invoke({scriptHash, operation, args, gasPrice, gasLimit});
+      console.log(result);
+    },
+    async recharge() {
+      const scriptHash = 'a3fa4f6e017baa64de534320431ef4a7a3edfe95';
+      const operation = 'Recharge';
+      const args = [{type: 'Bytearray', value: scriptHash}, {type: 'Bytearray', value: scriptHash}, {type: 'Integer', value: 5}];
+      const gasPrice = 500;
+      const gasLimit = 200000;
+      const result = await client.api.smartContract.invoke({scriptHash, operation, args, gasPrice, gasLimit});
+      console.log(result);
+    },
+    async banlanceTONT() {
+      const scriptHash = 'a3fa4f6e017baa64de534320431ef4a7a3edfe95';
+      const operation = 'banlanceTONT';
+      const args = [{type: 'Bytearray', value: scriptHash}, {type: 'Bytearray', value: scriptHash}, {type: 'Integer', value: 5}];
+      const result = await client.api.smartContract.invokeRead({scriptHash, operation, args});
+      console.log(result);
     }
   }
 }
