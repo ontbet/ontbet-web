@@ -38,7 +38,7 @@ export default {
       this.withdraw();
     },
     async withdraw() {
-      const scriptHash = 'a3fa4f6e017baa64de534320431ef4a7a3edfe95';
+      const scriptHash = '95feeda3a7f41e43204353de64aa7b016e4ffaa3';
       const operation = 'Withdraw';
       const args = [{type: 'Bytearray', value: scriptHash}, {type: 'Integer', value: 5}];
       const gasPrice = 500;
@@ -47,7 +47,7 @@ export default {
       console.log(result);
     },
     async recharge() {
-      const scriptHash = 'a3fa4f6e017baa64de534320431ef4a7a3edfe95';
+      const scriptHash = '95feeda3a7f41e43204353de64aa7b016e4ffaa3';
       const operation = 'Recharge';
       const args = [{type: 'Bytearray', value: scriptHash}, {type: 'Bytearray', value: scriptHash}, {type: 'Integer', value: 5}];
       const gasPrice = 500;
@@ -56,7 +56,7 @@ export default {
       console.log(result);
     },
     async banlanceTONT() {
-      const scriptHash = 'a3fa4f6e017baa64de534320431ef4a7a3edfe95';
+      const scriptHash = '95feeda3a7f41e43204353de64aa7b016e4ffaa3';
       const operation = 'banlanceTONT';
       const args = [{type: 'Bytearray', value: scriptHash}, {type: 'Bytearray', value: scriptHash}, {type: 'Integer', value: 5}];
       const result = await client.api.smartContract.invokeRead({scriptHash, operation, args});
