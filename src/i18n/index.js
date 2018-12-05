@@ -5,10 +5,6 @@ import zh from '@/languages/zh'
 import en from '@/languages/en'
 import enLocale from 'element-ui/lib/locale/lang/en'
 import zhLocale from 'element-ui/lib/locale/lang/zh-CN'
-import {
-    getCookie
-} from '@/utils/cookie'
-
 
 Vue.use(VueI18n)
 
@@ -17,8 +13,14 @@ const messages = {
     zh: Object.assign(zh, zhLocale)
 }
 
+// 获取html的lang属性
+function getLanguage () {
+    let language = window.navigator.language || window.navigator.browserLanguage;
+    return language ? language.split('-')[0] : '';
+}
+
 const i18n = new VueI18n({
-    locale: window.localStorage.getItem('locale') || getCookie('PLAY_LANG', 'zh'),
+    locale: window.localStorage.getItem('locale') || getLanguage() || 'en',
     messages
 })
 
