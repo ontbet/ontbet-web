@@ -4,7 +4,10 @@ import {
 } from './constant'
 
 export default {
+    /**
+     * 获取用户信息
+     */
     getUserInfo() {
-        return http.post(userinfo);
+        return http.post(USER_INFO);
     }
 }

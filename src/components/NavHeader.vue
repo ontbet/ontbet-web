@@ -1,5 +1,6 @@
 <template>
     <div class="nav-header">
+        <span>{{userInfo.name}}</span>
         <div class="logo">
             <img :src="logo" alt="LOGO">
         </div>
@@ -22,6 +23,8 @@
 </template>
 
 <script>
+import { mapGetters } from 'vuex'
+
 export default {
     data() {
         return {
@@ -36,6 +39,11 @@ export default {
             this.$i18n.locale = lang;
             window.localStorage.setItem("locale", lang);
         }
+    },
+    computed: {
+        ...mapGetters([
+            'userInfo'
+        ])
     }
 }
 </script>
