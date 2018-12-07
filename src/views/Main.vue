@@ -33,10 +33,7 @@ export default {
     DividendModal
   },
   methods: {
-    openModal(type) {
-      this.$refs[`${type}Modal`].open();
-      this.withdraw();
-    },
+  
     async withdraw() {
       const scriptHash = '95feeda3a7f41e43204353de64aa7b016e4ffaa3';
       const operation = 'Withdraw';
