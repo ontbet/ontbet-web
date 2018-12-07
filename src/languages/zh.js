@@ -28,6 +28,12 @@ module.exports = {
         number: ' 开奖号码',
         bonus: '奖金'
     },
+    help: {
+        content: [
+            '准备好你的EOS 帐号，如果还未有EOS帐号，可根据教程创建',
+            '您需要通过Scatter 在网页上操作帐号，如果还未有安装Scatter，请安装Scatter'
+        ]
+    },
     message: {
         'hello': '你好'
     },
