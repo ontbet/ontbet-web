@@ -1,7 +1,7 @@
 <template>
     <el-dialog :title="$t('modal.help')" width="600px" :visible.sync="show">
         <div>
-            <p>1、准备好你的Ontology 帐号，如果还未有Ontology帐号，可根据教程创建</p>
+            <p>1、准备好你的Ontology账号，如果还未有Ontology帐号，可根据教程创建</p>
             <p>2、您需要通过Cyano wallet 在网页上操作帐号，如果还未有安装Cyano wallet，请安装Cyano wallet</p>
             <p>3、按下登入按钮，通过Cyano wallet 进行登入</p>
             <p>4、可使用ONT、ONG、TNT进行投注</p>
