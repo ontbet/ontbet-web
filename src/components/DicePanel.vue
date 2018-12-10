@@ -81,12 +81,14 @@ export default {
     };
   },
   methods: {
+  //关于一些字符串的转换啊，hex转换的方法，都可以去https://github.com/ontio-community/Smartx-ide-components/blob/master/src/components/scIDE/Tool.vue ，这里找参考调用。
     async test(){
         let userScriptHash = '64f75b59554a2008bcc1a87a7ae09249abc74a91'; //AQyjYLQNRXtjr6cPoru1vpCTwehg6EQPCs的scripthash
         const txlog = await client.api.network.getSmartCodeEvent({value:"e476c3212462777cd1c2a07f58151c0f942cd067866c92daf7accc699ad3e590"});
         console.log(txlog)
         //this.recharge(userScriptHash,userScriptHash,1)
     },
+  
     async banlanceTONT(userScriptHash) {
       //判断一下长度是否是20
       const scriptHash = "95feeda3a7f41e43204353de64aa7b016e4ffaa3";
