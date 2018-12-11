@@ -227,8 +227,65 @@ export default {
       ONT = 2;
       TNT = 3;
       TONT = 4;
+
       MAX_NUMBER = 95;
       MIN_NUMBER = 4;
+
+      TNT_DEGREE = 10 ^ 8; //币种的精度，最好这里变成biginter来计算，免得JS不支持那么大的数计算,这里可以弄成全局变量
+      ONG_DEGREE = 10 ^ 8;
+      TONT_DEGREE = 10 ^ 8;
+
+      if (len(fromUserScriptHash) != 20 || len(inviterScriptHash) != 20) {
+        //scripthash的长度为20，
+        return false;
+      }
+      //把小数转换为整数，因为ONT区块链不支持小数，只能通过放大的方式来，实现小数
+      if (tokentype == ONT) {
+        //ONT不能投注，必须得充值转换为TONT，才能下注
+        return false;
+      } else if (tokentype == TNT) {
+        amount = amount * TNT_DEGREE;
+      } else if (tokentype == TONT) {
+        amount = amount * TONT_DEGREE;
+      } else if (tokentype == ONG) {
+        amount = amount * ONG_DEGREE;
+      }
+
+      if (number < MIN_NUMBER || number > MAX_NUMBER) {
+        //核对一下，下注的范围，还要考虑一下，这里也不能是小数
+
+        return;
+      }
+      const scriptHash = "95feeda3a7f41e43204353de64aa7b016e4ffaa3"; //合约的地址
+      const operation = "Guess"; //调用合约的方法名
+      const args = [
+        { type: "Bytearray", value: fromUserScriptHash },
+        { type: "Integer", value: tokentype },
+        { type: "Integer", value: number },
+        { type: "Integer", value: amount },
+        { type: "Bytearray", value: inviterScriptHash }
+      ]; //合约的参数
+
+      const gasPrice = 500;
+      const gasLimit = 200000;
+      const result = await client.api.smartContract.invoke({
+        scriptHash,
+        operation,
+        args,
+        gasPrice,
+        gasLimit
+      }); //向区块链节点发送该交易，会返回该次交易的hash
+      console.log(result); //大概1秒后再接下去请求。
+      const txlog = await client.api.network.getSmartCodeEvent(
+        result["transaction"]
+      ); //利用该交易的hash去，去查询该交易的状态，json里面有个notify
+      console.log(txlog); //notify里面都有的，都是对应字符串的hexstring的模式，需要把hexstaring转换为str。具体你们可以调试一下，到这个位置，看看内容。
+      //如果竞猜成功，notify里面的state数组里面有一个内容是：['guess', 下注币种类型,投注人scripthash, 下注多少, 总的第几局, 下注数字, 系统出的数字]
+      //如果有其他错误是有：['error',错误消息提示]（例如['error',"BET number error"]），后面我们可以设定一下错误码什么的
+      //这里需要取里面的值，出来判断一下。
+    },
+    async recharge(fromUserScriptHash, toUserScript, amount) {
+      //付款账户，充值给谁，充值的个数，需要修改，不能跑完成吧，需要容错处理和健壮性
 
       TNT_DEGREE = 10 ^ 8; //币种的精度，最好这里变成biginter来计算，免得JS不支持那么大的数计算,这里可以弄成全局变量
       ONG_DEGREE = 10 ^ 8;
@@ -280,31 +337,6 @@ export default {
       //这里需要取里面的值，出来判断一下。
     },
 
-    async recharge(fromUserScriptHash, toUserScript, amount) {
-      //付款账户，充值给谁，充值的个数，需要修改，不能跑完成吧，需要容错处理和健壮性
-      //这里可以来一些检测，如账户的检测，是否都为20长度的字符串
-      const scriptHash = "95feeda3a7f41e43204353de64aa7b016e4ffaa3"; //合约的地址
-      const operation = "Recharge"; //调用合约的方法名
-      const args = [
-        { type: "Bytearray", value: fromUserScriptHash },
-        { type: "Bytearray", value: toUserScript },
-        { type: "Integer", value: amount }
-      ];
-      const gasPrice = 500;
-      const gasLimit = 200000;
-      const result = await client.api.smartContract.invoke({
-        scriptHash,
-        operation,
-        args,
-        gasPrice,
-        gasLimit
-      });
-      console.log(result); //大概1秒后再接下去请求。
-      const txlog = await client.api.network.getSmartCodeEvent(
-        result["transaction"]
-      ); //得到交易的状态，json里面有个notify
-      console.log(txlog); //notify里面都有的
-    },
     //把账户里的TONT提取转换为ONT，这里也必须是整数
     async Withdraw(fromUserScriptHash, amount) {
       const scriptHash = "95feeda3a7f41e43204353de64aa7b016e4ffaa3"; //合约的地址
@@ -332,6 +364,7 @@ export default {
       //获取用户信息
       let Crypto = Ont.Crypto;
       let util = Ont.utils;
+
       client.registerClient({});
       const account = await client.api.asset.getAccount(); //得到当前插件钱包的用户地址。
       console.log(account);
@@ -341,6 +374,7 @@ export default {
       console.log(newScriptHash);
       this.Address = Address;
       this.scriptHash = newScriptHash;
+
       let bla = banlanceTONT(newScriptHash); //获取当前钱包用户的TONT的多少。这里调用不到，肯定是我的其他有问题
       console.log(bla);
     }
