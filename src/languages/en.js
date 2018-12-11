@@ -3,9 +3,11 @@ module.exports = {
     nav: {
         disc: 'Disc',
         help: 'Help',
-        dividend: 'Dividend'
+        dividend: 'Dividend',
+        balance: 'Balance'
     },
     game: {
+        beetinIsNull: 'Please fill in the bet amount',
         betting: 'BET AMOUNT',
         obtain: 'PAYOUT ON WIN',
         victoryCondition: 'ROLL UNDER TO WIN',
@@ -18,7 +20,11 @@ module.exports = {
     },
     modal: {
         help: 'Help',
-        dividend: 'Dividends'
+        dividend: 'Dividends',
+        withdraw: 'Withdraw',
+        recharge: 'Recharge',
+        gameResult: 'Result',
+        gameSubmit: 'Confirm Submission'
     },
     table: {
         time: 'Time',
@@ -32,6 +38,11 @@ module.exports = {
         'hello': 'heelo'
     },
     btn: {
-        login: 'Login'
+        login: 'Login',
+        submit: 'Submit',
+        withdraw: 'Withdraw',
+        recharge: 'Recharge',
+        ok: 'Ok',
+        cancel: 'Cancel'
     }
 }

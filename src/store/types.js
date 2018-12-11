@@ -1,0 +1,5 @@
+export const LOGIN_STATUS = 'LOGIN_STATUS'
+export const USER = 'USER'
+export const BALANCE = 'BALANCE'
+export const BT_TYPE = 'BT_TYPE'
+export const CURRENCYS = 'CURRENCYS'

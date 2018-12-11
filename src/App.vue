@@ -5,6 +5,7 @@
 </template>
 
 <style lang="less">
+@import url('./assets/styles/elm.rest.less');
 html, body {
   width: 100%;
   box-sizing: border-box;

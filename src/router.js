@@ -1,6 +1,7 @@
 import Vue from 'vue'
 import Router from 'vue-router'
 import Main from './views/Main'
+import Money from './views/Money'
 
 Vue.use(Router)
 
@@ -11,6 +12,11 @@ export default new Router({
       name: 'main',
       component: Main
     },
+    {
+      path: '/money/:type',
+      name: 'money',
+      component: Money
+    }
     // {
     //   path: '/about',
     //   name: 'about',

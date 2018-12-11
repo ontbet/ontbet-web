@@ -1,7 +1,7 @@
 <template>
     <el-dialog :title="$t('modal.help')" width="600px" :visible.sync="show">
         <div>
-            <p>1、准备好你的Ontology 帐号，如果还未有Ontology帐号，可根据教程创建</p>
+            <p>1、准备好你的Ontology账号，如果还未有Ontology帐号，可根据教程创建</p>
             <p>2、您需要通过Cyano wallet 在网页上操作帐号，如果还未有安装Cyano wallet，请安装Cyano wallet</p>
             <p>3、按下登入按钮，通过Cyano wallet 进行登入</p>
             <p>4、可使用ONT、ONG、TNT进行投注</p>
@@ -11,6 +11,7 @@
             <p>由于游戏都在Ontology 的智能合约上执，因此游戏保证公平，并不能作弊。我们透过独有的加密技术，保证赛果不会被更改，请您放心下注。</p>
             <div class="help-certification-wrap"><el-button type="primary">Verify</el-button></div>
         </div>
+        <div slot="footer"><el-button type="primary">Verify</el-button></div>
     </el-dialog>
 </template>
 
@@ -33,12 +34,4 @@ export default {
 </script>
 
 <style lang="less">
-.el-dialog__body {
-    padding: 10px 20px;
-    background-color: #f5f6f7;
-}
-.help-certification-wrap {
-    padding: 10px 0;
-    text-align: right;
-}
 </style>

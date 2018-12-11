@@ -3,9 +3,11 @@ module.exports = {
     nav: {
         disc: '骰子',
         help: '帮助',
-        dividend: '股息'
+        dividend: '股息',
+        balance: '余额'
     },
     game: {
+        beetinIsNull: '请填写投注金额',
         betting: '投注金额',
         obtain: '赢取奖金',
         victoryCondition: '小于该数获胜',
@@ -18,7 +20,11 @@ module.exports = {
     },
     modal: {
         help: '帮助',
-        dividend: '股息'
+        dividend: '股息',
+        withdraw: '提现',
+        recharge: '充值',
+        gameResult: '结果',
+        gameSubmit: '确认投注'
     },
     table: {
         time: '时间',
@@ -38,6 +44,11 @@ module.exports = {
         'hello': '你好'
     },
     btn: {
-        login: '登录'
+        login: '登录',
+        submit: '提交',
+        withdraw: '提现',
+        recharge: '充值',
+        ok: '确认',
+        cancel: '取消'
     }
 }

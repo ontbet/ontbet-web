@@ -1,9 +1,15 @@
 <template>
   <div class="main">
+
     <!-- 帮助 -->
     <help-modal ref="helpModal"></help-modal>
     <!-- 股息 -->
     <dividend-modal ref="dividendModal"></dividend-modal>
+    <!-- 提现 -->
+    <withdraw-modal ref="withdrawModal"></withdraw-modal>
+    <!-- 充值 -->
+    <recharge-modal ref="rechargeModal"></recharge-modal>
+
     <div id="nav">
       <nav-header 
         @open-modal="openModal"></nav-header>
@@ -21,6 +27,8 @@ import DicePanel from '@/components/DicePanel'
 import BettingPanel from '@/components/BettingPanel'
 import HelpModal from '@/components/HelpModal'
 import DividendModal from '@/components/DividendModal'
+import WithdrawModal from '@/components/WithdrawModal'
+import RechargeModal from '@/components/RechargeModal'
 import { client } from 'ontology-dapi';
 
 
@@ -30,7 +38,9 @@ export default {
     DicePanel,
     BettingPanel,
     HelpModal,
-    DividendModal
+    DividendModal,
+    WithdrawModal,
+    RechargeModal
   },
   methods: {
   
@@ -58,6 +68,9 @@ export default {
       const args = [{type: 'Bytearray', value: scriptHash}, {type: 'Bytearray', value: scriptHash}, {type: 'Integer', value: 5}];
       const result = await client.api.smartContract.invokeRead({scriptHash, operation, args});
       console.log(result);
+    },
+    openModal(type) {
+      this.$refs[`${type}Modal`].open();
     }
   }
 }

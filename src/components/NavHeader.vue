@@ -1,6 +1,7 @@
 <template>
     <div class="nav-header">
-        <span>{{userInfo.name}}</span>
+        <span>{{user.name}}</span>
+        <span>{{$i18n.locale}}</span>
         <div class="logo">
             <img :src="logo" alt="LOGO">
         </div>
@@ -10,6 +11,19 @@
             <li class="nav-menu-item" @click="openModal('dividend')">{{$t('nav.dividend')}}</li>
             <li class="nav-menu-item" @click="openModal('help')">{{$t('nav.help')}}</li>
         </ul>
+        <el-popover
+            v-if="loginStatus"
+            placement="bottom"
+            width="200"
+            trigger="hover">
+            <div>
+                <el-row :gutter="15">
+                    <el-col :span="12"><el-button type="success" style="width: 100%" @click="openModal('recharge')">{{$t('btn.recharge')}}</el-button></el-col>
+                    <el-col :span="12"><el-button type="primary" style="width: 100%" @click="openModal('withdraw')">{{$t('btn.withdraw')}}</el-button></el-col>
+                </el-row>
+            </div>
+            <span slot="reference" class="balance-btn">{{$t('nav.balance')}}: {{balance[btType]}} {{currencys[btType].name}}</span>
+        </el-popover>
         <el-dropdown>
             <span class="language-btn">
                 {{$t('lang')}}<i class="el-icon-arrow-down el-icon--right"></i>
@@ -42,8 +56,12 @@ export default {
     },
     computed: {
         ...mapGetters([
-            'userInfo'
-        ])
+            'user',
+            'balance',
+            'loginStatus',
+            'btType',
+            'currencys'
+        ]),
     }
 }
 </script>
@@ -90,5 +108,11 @@ export default {
     font-size: 14px;
     color: #fff;
     cursor: pointer;
+}
+.balance-btn {
+    padding: 4px 5px 4px 0;
+    margin-right: 25px;
+    cursor: pointer;
+    font-size: 14px;
 }
 </style>
