@@ -46,9 +46,10 @@ export default {
           this.userScriptHash,
           this.userScriptHash,
           this.value
-        ).then(() => {
-          alert("1");
-        });
+        );
+      },
+      ()=>{
+          console.log("请登录或安装插件钱包")
       });
 
       this.close();
@@ -94,7 +95,7 @@ export default {
                     //对应自己的合约hash里面没有error的信息，就代表成功，
                 },
                 (err)=>{
-                    console.log(err);//这里可能是网络原因或者交易还没被执行，还没有结果会到这里。
+                    console.log(err);//这里可能是网络原因,或者交易还没被执行，还没有结果会到这里。
                 }
             ); 
             
@@ -103,7 +104,7 @@ export default {
         (err)=>{
             console.log(err)//发送交易执行失败走这里，或者用户取消交易导致的
             if(err == "CANCELED"){
-                //用户在主动取消的，点击了cancel按钮的情况
+                //用户在主动取消的，点击
             }
         }
         );
