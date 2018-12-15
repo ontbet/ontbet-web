@@ -24,7 +24,8 @@ export default {
         withdraw: 'Withdraw',
         recharge: 'Recharge',
         gameResult: 'Result',
-        gameSubmit: 'Confirm Submission'
+        gameSubmit: 'Confirm Submission',
+        invite: 'Invite friends'
     },
     table: {
         time: 'Time',
@@ -42,11 +43,21 @@ export default {
     },
     message: {
         'hello': '你好',
-        'rechargeNull': '提现额度不能小于1',
+        'rechargeNull': '充值额度不能小于1',
+        'withdrawNull': '提现额度不能小于1',
         'dice': '下注可获得10 TNT',
         'rechargeCanel': '已取消充值',
         'rechargeSuccess': '充值成功',
-        'rechargeError': '充值失败'
+        'rechargeError': '充值失败',
+        'withdrawCanel': '已取消提现',
+        'withdrawSuccess': '提现成功',
+        'withdrawError': '提现失败',
+        'errorCode01': '错误的下注额，小于最小下注额',
+        'errorCode02': '错误的下注数字，范围不在最小到最大数字之间',
+        'errorCode03': '账户地址出错',
+        'errorCode04': '账户余额不足',
+        'errorCode05': '提取TONT出错，提取数量必须为整数',
+        'errorCode06': '认证失败',
     },
     btn: {
         login: 'Login',

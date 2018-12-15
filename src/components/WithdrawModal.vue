@@ -1,8 +1,10 @@
 <template>
-  <el-dialog :title="$t('modal.withdraw')"
-    width="400px" 
+  <el-dialog
+    :title="$t('modal.withdraw')"
+    width="400px"
     :visible.sync="show"
-    :close-on-click-modal="false">
+    :close-on-click-modal="false"
+  >
     <div class="result-number">{{value}} (TONT) = {{result}} (ONT)</div>
     <el-input-number
       v-model="value"
@@ -15,15 +17,20 @@
     ></el-input-number>
     <span slot="footer">
       <el-button @click="close">{{$t('btn.cancel')}}</el-button>
-      <el-button type="primary" @click="submit" :loading="loading">{{loading ? '提现中' : $t('btn.ok')}}</el-button>
+      <el-button
+        type="primary"
+        @click="submit"
+        :loading="loading"
+      >{{loading ? '提现中' : $t('btn.ok')}}</el-button>
     </span>
   </el-dialog>
 </template>
 
 <script>
 import { mapGetters } from "vuex";
-import { toFixed, multiple } from "@/utils/util";
+import { toFixed, multiple, showMsg } from "@/utils/util";
 import { client } from "ontology-dapi";
+import userService from "@/services/user";
 
 let Ont = require("ontology-ts-sdk");
 
@@ -38,6 +45,21 @@ export default {
       }
     };
   },
+  computed: {
+    ...mapGetters([
+      "account",
+      "address",
+      "scriptHash",
+      "contractHash",
+      "balance",
+      "loginStatus",
+      "bcType",
+      "currencys"
+    ]),
+    result() {
+      return (this.value || 0) * 1;
+    }
+  },
   methods: {
     open() {
       this.value = 0;
@@ -45,55 +67,32 @@ export default {
     },
     close() {
       this.show = false;
+      this.loading = false;
     },
     submit() {
-        if(!this.value) {
-          return this.$message({
-            message: this.$t('message.rechargeNull'),
-            type: 'warning'
-          });
-        }
-        this.loading = true;
-        let TONT_DRGREE = 10 ^ 8
-        this.GetUserInfo().then(() => {
-        this.Withdraw(
-          this.userScriptHash,
-          this.value * 100000000
-        ).then(() => {
-          alert("1");
-        });
-      });
-      //this.close();
+      if (!this.value) {
+        return showMsg(this.$t("message.withdrawNull"));
+      }
+      this.loading = true;
+      let TONT_DRGREE = 10 ^ 8;
+      userService.getAccount().then(res => {
+        this.withdraw(this.scriptHash, this.value * 100000000);
+      }).catch(err => {
+        console.log('未获取钱包信息');
+      })
     },
-    async GetUserInfo() {
-      let Crypto = Ont.Crypto;
-      let util = Ont.utils;
-      client.registerClient({});
-      const account = await client.api.asset.getAccount(); //得到当前插件钱包的用户地址。
-      console.log(account);
-      let Address = new Crypto.Address(account);
-      console.log(Address);
-      this.userAddress = Address.toString();
-      this.userScriptHash = Address.serialize();
-    },
-    async Withdraw(fromUserScriptHash, amount) {
-      console.log(amount)
-      const scriptHash = "95feeda3a7f41e43204353de64aa7b016e4ffaa3"; //合约的地址
+
+    withdraw(formUser, amount) {
+      const scriptHash = this.contractHash; //合约的地址
       const operation = "Withdraw"; //调用合约的方法名
       const args = [
-        { type: "Bytearray", value: fromUserScriptHash },
+        { type: "Bytearray", value: formUser },
         { type: "Integer", value: amount }
       ];
       const gasPrice = 500;
       const gasLimit = 200000;
       client.api.smartContract
-        .invoke({
-          scriptHash,
-          operation,
-          args,
-          gasPrice,
-          gasLimit
-        })
+        .invoke({scriptHash, operation, args, gasPrice, gasLimit})
         .then(
           result => {
             setTimeout(() => {
@@ -124,12 +123,6 @@ export default {
             }
           }
         );
-    }
-  },
-  computed: {
-    ...mapGetters(["user", "balance", "loginStatus", "bcType", "currencys"]),
-    result() {
-      return (this.value || 0) * 1;
     }
   }
 };

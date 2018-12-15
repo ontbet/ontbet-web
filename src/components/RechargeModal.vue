@@ -24,7 +24,7 @@
 
 <script>
 import { mapGetters } from "vuex";
-import { toFixed, multiple } from "@/utils/util";
+import { toFixed, multiple, showMsg } from "@/utils/util";
 import { client } from "ontology-dapi";
 import userService from '@/services/user'
 
@@ -61,6 +61,7 @@ export default {
     },
     close() {
       this.show = false;
+      this.loading = false;
     },
     submit() {
       if (!this.value) {
@@ -72,60 +73,68 @@ export default {
       }).catch(err => {
         console.log('未获取钱包信息');
       })
-      this.close();
-    },
-    showMsg(msg, type="warring") {
-      this.$message({
-          message: msg,
-          type: type
-        });
     },
 
     recharge(from, to, amount) {
       //付款账户，充值给谁，充值的个数，需要修改，不能跑完成吧，需要容错处理和健壮性
       //这里可以来一些检测，如账户的检测，是否都为20长度的字符串
+      const scriptHash = this.contractHash
       const gasPrice = 500;
       const gasLimit = 200000;
       const operation = "Recharge"; //调用合约的方法名
       const args = [
-        { type: "Bytearray", value: from },
-        { type: "Bytearray", value: to },
+        { type: "ByteArray", value: from },
+        { type: "ByteArray", value: to },
         { type: "Integer", value: amount }
       ];
-      client.api.smartContract.invoke({
-        scriptHash: this.contractHash,
-        operation,
-        args,
-        gasPrice,
-        gasLimit
-      }).then(result => {
-        setTimeout(() => {
+      client.api.smartContract
+        .invoke({scriptHash, operation, args, gasPrice, gasLimit})
+        .then(result => {
+        // setTimeout(() => {
+          console.log('交易发送成功');
           console.log(2);
           console.log(result);
           console.log(result["transaction"]);
           let txid = result["transaction"]; //这里需要判断一下，是否成功什么的。
           client.api.network.getSmartCodeEvent({ value: txid.toString()}).then(
             res => {
+              console.log('交易完成');
               console.log(res); //得到交易的状态，json里面有个notify
-              this.showMsg(this.$t('message.rechargeSuccess', 'success'))
+              const notify = res.Notify;
+              const successLength = notify.filter(item => {
+                return item.ContractAddress === this.contractHash && item.States.filter(citem => citem === '73756363657373').length;
+              }).length;
+              const errors = notify.filter(item => {
+                return item.States.filter(citem => citem === '6572726f72').length;
+              });
+              console.log(successLength);
+              if(successLength) {
+                showMsg(this.$t('message.rechargeSuccess'), 'success')
+              } else {
+                const msg = '充值失败';
+                if(errors.length) {
+                  msg = $t('message.errorCode' + errors[0][1]);
+                }
+                showMsg(msg)
+              }
               //取txlogjson文件中的最终信息，来看，结果，然后给界面上相应响应，主要看NOtify中对应的自己合约的东西。
               //对应自己的合约hash里面没有error的信息，就代表成功，
             },
             err => {
               console.log(err); //这里可能是网络原因,或者交易还没被执行，还没有结果会到这里。
             }
-          );
-        }, 1500);
+          ).fin;
+        // }, 1500);
       },
       err => {
         console.log(err); //发送交易执行失败走这里，或者用户取消交易导致的
         //用户在主动取消的，点击
         if (err == "CANCELED") {
-          this.showMsg(this.$t('message.rechargeCanel'))
+          showMsg(this.$t('message.rechargeCanel'))
         } else {
-          this.showMsg(this.$t('message.rechargeError'))
+          showMsg(this.$t('message.rechargeError'))
         }
-      });
+      }).finally(() => this.close());
     }
   }
 };

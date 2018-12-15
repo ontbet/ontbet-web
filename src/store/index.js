@@ -11,7 +11,8 @@ import {
     ADDRESS,
     SCRIPT_HASH,
     EMPTY_USER,
-    ACCOUNT
+    ACCOUNT,
+    TONT
 } from './types'
 
 Vue.use(Vuex)
@@ -72,7 +73,7 @@ export default new Vuex.Store({
             state.scriptHash = payload.scriptHash;
         },
         [BALANCE](state, data) {
-            state.balance = data;
+            Object.assign(state.balance, data);
         },
         [BT_TYPE](state, data) {
             state.bcType = data;
@@ -93,19 +94,23 @@ export default new Vuex.Store({
                 'ONG': 0,
                 'TNT': 0
             };
+        },
+        [TONT](state, data = 0) {
+            state.balance['TONT'] = data;
         }
+
     },
     actions: {
         getAccount({
-            commit,
             dispatch,
+            commit
         }) {
             userService.getAccount().then(res => {
                 commit(LOGIN_STATUS, true)
                 commit(ACCOUNT, res)
                 commit(ADDRESS, res)
                 commit(SCRIPT_HASH, res)
-                dispatch('getBalance')
+                dispatch('getTont');
                 return userService.getBalance(res.address)
             }).then(res => {
                 commit(BALANCE, res)
@@ -114,19 +119,15 @@ export default new Vuex.Store({
                 commit(EMPTY_USER)
             })
         },
-        getBalance({
+        getTont({
             commit,
             state
         }) {
             userService.getTont(state.contractHash, state.scriptHash).then(res => {
                 console.log(res);
+                // 处理返回的TONT数量
+                commit(TONT, res)
             })
-        },
-        // 获取hash地址
-        getHash({
-            commit
-        }) {
-            commit(HASH, '测试hash数据')
         }
     },
     getters: {

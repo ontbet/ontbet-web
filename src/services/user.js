@@ -10,11 +10,11 @@ export default {
         client.registerClient({});
         const account = await client.api.asset.getAccount();
         const address = new Ont.Crypto.Address(account);
-        const scripthash = address.serialize();
+        const scriptHash = address.serialize();
         return {
             account,
             address: address.value || '',
-            scripthash
+            scriptHash
         };
     },
 
@@ -23,7 +23,8 @@ export default {
      * @param {*} address 
      */
     async getBalance(address) {
-        return await client.api.provider.getProvider({
+        console.log(client.api);
+        return await client.api.network.getBalance({
             address: address
         });
     },
@@ -35,7 +36,7 @@ export default {
      */
     async getTont(chash, uhash) {
         const args = [{
-            type: "Bytearray",
+            type: "ByteArray",
             value: uhash
         }];
         const result = await client.api.smartContract.invokeRead({

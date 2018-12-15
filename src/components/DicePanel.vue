@@ -82,8 +82,12 @@
           </el-col>
         </el-row>
       </div>
-      <div class="dice-slide">
-        <el-slider v-model="target" :max="100" :min="1" height="20" @change="changeTarget"></el-slider>
+      <div class="dice-slide-wrap">
+        <span>1</span>
+        <div class="dice-slide">
+          <el-slider v-model="target" :max="100" :min="1" height="20" @change="changeTarget"></el-slider>
+        </div>
+        <span>100</span>
       </div>
       <div class="dice-user">
         <template v-if="loginStatus">
@@ -125,11 +129,13 @@
             <template v-if="game.status === 2">{{game.randomNumber}}</template>
             <template v-else>{{$t("btn.submit")}}</template>
           </el-button>
-          <span style="flex: 1"> 100 TNT ({{$t('message.dice')}})</span>
+          <span style="flex: 1"> 100 TNT</span>
         </template>
         <el-button v-else type="primary" @click="test">{{$t("btn.login")}}</el-button>
       </div>
-      <div class="dice-remark"></div>
+      <div class="dice-remark">
+        <span>{{$t('message.dice')}}</span>
+      </div>
     </div>
   </div>
 </template>
@@ -200,7 +206,7 @@ export default {
     // 监听目标点数
     changeTarget(value) {
       if(value > 96) this.target = 96;
-      if(value < 4) this.target = 4;
+      if(value < 2) this.target = 2;
     },
     // 投注
     submit() {
@@ -485,8 +491,17 @@ export default {
   font-size: 34px;
 }
 // 滑动条
-.dice-slide {
+.dice-slide-wrap {
   padding-top: 30px;
+  display: flex;
+  align-items: center;
+  & > span {
+    padding: 10px;
+  }
+}
+.dice-slide {
+  width: 0;
+  flex: 1;
 }
 .dice-user {
   padding: 10px 0;
@@ -498,6 +513,17 @@ export default {
 }
 .balance-btn {
   cursor: pointer;
+}
+.dice-remark {
+  padding-top: 30px;
+  text-align: center;
+  span {
+    display: inline-block;
+    padding: 10px 20px;
+    background-color: #111;
+    font-size: 14px;
+    border-radius: 20px;
+  }
 }
 .el-slider__runway {
   height: 12px;

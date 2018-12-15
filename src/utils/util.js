@@ -1,4 +1,5 @@
 import mathjs from 'mathjs'
+import { Message } from 'element-ui'
 
 /**
  * 四舍五入
@@ -19,4 +20,11 @@ export function toFixed(num, bit = 2) {
  */
 export function multiple(arr = []) {
     return mathjs.multiply(...arr);
+}
+
+export function showMsg(msg = '无内容', type = 'warring') {
+    Message({
+        message: msg,
+        type: type
+    })
 }
