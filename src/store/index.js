@@ -127,6 +127,8 @@ export default new Vuex.Store({
                 console.log(res);
                 // 处理返回的TONT数量
                 commit(TONT, res)
+            }).catch(err => {
+                commit(TONT, 0)
             })
         }
     },
