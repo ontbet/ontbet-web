@@ -1,4 +1,6 @@
 import mathjs from 'mathjs'
+import store from '@/store'
+import { BT_TYPE } from '@/store/types'
 
 export default {
 
@@ -64,6 +66,16 @@ export default {
             return false;
         }
         return true;
+    },
+
+    /**
+     * 修改币种类型
+     * @param {*} type 
+     */
+    changeBcType(type) {
+        if(type && type !== store.state.bcType) {
+            store.commit(BT_TYPE, type)
+        }
     }
 
 }

@@ -1,23 +1,49 @@
+import { client } from "ontology-dapi";
+let Ont = require("ontology-ts-sdk");
+
 export default {
+
     /**
-     * 获取用户信息
+     * 获取账户信息
      */
-    getUserInfo() {
-        console.log('获取用户信息');
+    async getAccount() {
+        client.registerClient({});
+        const account = await client.api.asset.getAccount();
+        const address = new Ont.Crypto.Address(account);
+        const scripthash = address.serialize();
         return {
-            name: '张三',
-            address: '64f75b59554a2008bcc1a87a7ae09249abc74a91',
-            scripthash: '95feeda3a7f41e43204353de64aa7b016e4ffaa3'
-        }
+            account,
+            address: address.value || '',
+            scripthash
+        };
     },
 
     /**
-     * 获取钱包余额
+     * 获取账户余额
+     * @param {*} address 
      */
-    getBalance() {
-        console.log('获取钱包余额');
-        return {
-            'TONT': 2.00
-        }
+    async getBalance(address) {
+        return await client.api.provider.getProvider({
+            address: address
+        });
+    },
+
+    /**
+     * 获取TONT余额
+     * @param {*} chash 合约hash
+     * @param {*} uhash 用户hash - scriptHash
+     */
+    async getTont(chash, uhash) {
+        const args = [{
+            type: "Bytearray",
+            value: uhash
+        }];
+        const result = await client.api.smartContract.invokeRead({
+            scriptHash: chash,
+            operation: 'banlanceTONT',
+            args
+        }); //得到banlanceTONT返回的调用结果，结果返回的是一个hexstring的int，需要转换一下。
+        return result;
     }
+
 }

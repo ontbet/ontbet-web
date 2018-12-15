@@ -1,4 +1,4 @@
-module.exports = {
+export default {
     lang: '中文',
     nav: {
         disc: '骰子',
@@ -41,7 +41,12 @@ module.exports = {
         ]
     },
     message: {
-        'hello': '你好'
+        'hello': '你好',
+        'rechargeNull': '提现额度不能小于1',
+        'dice': '下注可获得10 TNT',
+        'rechargeCanel': '已取消充值',
+        'rechargeSuccess': '充值成功',
+        'rechargeError': '充值失败'
     },
     btn: {
         login: '登录',

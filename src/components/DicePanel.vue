@@ -1,13 +1,9 @@
 <template>
   <div class="dice-wrap">
-    <!-- 提交modal -->
-    <el-dialog :title="$t('modal.gameSubmit')" :visible.sync="submitModal.show" width="30%">
-      <span>这是一段信息</span>
-      <span slot="footer">
-        <el-button @click="closeSubmitModal">{{$t('btn.cancel')}}</el-button>
-        <el-button type="primary" @click="submit">{{$t('btn.ok')}}</el-button>
-      </span>
-    </el-dialog>
+    <!-- 提现 -->
+    <withdraw-modal ref="withdrawModal"></withdraw-modal>
+    <!-- 充值 -->
+    <recharge-modal ref="rechargeModal"></recharge-modal>
     <!-- 游戏结果modal -->
     <el-dialog :title="$t('modal.gameResult')" :visible.sync="resultModal.show" width="30%">
       <span>这是返回的结果信息</span>
@@ -15,12 +11,21 @@
         <el-button type="primary" @click="closeResultModal">{{$t('btn.ok')}}</el-button>
       </span>
     </el-dialog>
-
+    
     <div class="dice-panel">
-      <div class="dice-amount">
+      <div class="dice-types">
+        <el-button
+          v-for="(item, key) in currencys"
+          :key="key"
+          :type="item.name === bcType ? 'primary' : ''"
+          size="small"
+          @click="changeBcType(key)"
+        >{{item.name}}</el-button>
+      </div>
+      <div class="dice-amount" v-if="currencys">
         <el-row :gutter="20">
           <el-col :span="16">
-            <div class="dice-atr-title">{{$t('game.betting')}}({{currencys[currencyIndex].name}})</div>
+            <div class="dice-atr-title">{{$t('game.betting')}}({{bt.name}})</div>
             <div class>
               <el-row>
                 <el-col :span="12">
@@ -29,8 +34,8 @@
                     :step="1"
                     :controls="false"
                     :precision="2"
-                    :min="currencys[currencyIndex].min"
-                    :max="currencys[currencyIndex].max"
+                    :min="bt.min"
+                    :max="bt.max"
                     class="dice-input"
                   ></el-input-number>
                 </el-col>
@@ -47,7 +52,7 @@
             </div>
           </el-col>
           <el-col :span="8">
-            <div class="dice-atr-title">{{$t('game.obtain')}}({{currencys[currencyIndex].name}})</div>
+            <div class="dice-atr-title">{{$t('game.obtain')}}({{bt.name}})</div>
             <div class="dice-bonus">{{bonus}}</div>
           </el-col>
         </el-row>
@@ -78,22 +83,53 @@
         </el-row>
       </div>
       <div class="dice-slide">
-        <el-slider v-model="target" :max="95" :min="4" height="20"></el-slider>
+        <el-slider v-model="target" :max="100" :min="1" height="20" @change="changeTarget"></el-slider>
       </div>
       <div class="dice-user">
         <template v-if="loginStatus">
+          <el-popover
+            placement="bottom"
+            width="200"
+            trigger="hover"
+            style="flex: 1;"
+            class="balance-btn"
+          >
+            <div>
+              <el-row :gutter="15">
+                <el-col :span="12">
+                  <el-button
+                    type="success"
+                    style="width: 100%"
+                    @click="openModal('recharge')"
+                  >{{$t('btn.recharge')}}</el-button>
+                </el-col>
+                <el-col :span="12">
+                  <el-button
+                    type="primary"
+                    style="width: 100%"
+                    @click="openModal('withdraw')"
+                  >{{$t('btn.withdraw')}}</el-button>
+                </el-col>
+              </el-row>
+            </div>
+            <span
+              slot="reference"
+            >{{$t('nav.balance')}}: {{balance[bcType]}} {{currencys[bcType].name}}</span>
+          </el-popover>
           <el-button
             :loading="game.status === 1"
             type="primary"
-            @click="openSubmitModal"
+            @click="submit"
             style="width: 100px"
           >
             <template v-if="game.status === 2">{{game.randomNumber}}</template>
             <template v-else>{{$t("btn.submit")}}</template>
           </el-button>
+          <span style="flex: 1"> 100 TNT ({{$t('message.dice')}})</span>
         </template>
         <el-button v-else type="primary" @click="test">{{$t("btn.login")}}</el-button>
       </div>
+      <div class="dice-remark"></div>
     </div>
   </div>
 </template>
@@ -103,24 +139,25 @@ import { mapGetters } from "vuex";
 import { client } from "ontology-dapi";
 import { toFixed, multiple } from "@/utils/util";
 import dicePanelService from "@/services/dice-panel";
+import WithdrawModal from "@/components/WithdrawModal";
+import RechargeModal from "@/components/RechargeModal";
 let Ont = require("ontology-ts-sdk");
 
 let gameTimer = null;
 
 export default {
+  components: {
+    WithdrawModal,
+    RechargeModal
+  },
   data() {
     return {
       multiples: dicePanelService.multiples,
-      currencys: dicePanelService.currencys,
-      currencyIndex: 0,
       betting: {
         current: 0,
         max: 10000
       },
       target: 50,
-      submitModal: {
-        show: false
-      },
       resultModal: {
         show: false
       },
@@ -134,7 +171,7 @@ export default {
     };
   },
   computed: {
-    ...mapGetters(["user", "balance", "loginStatus"]),
+    ...mapGetters(["user", "balance", "loginStatus", "currencys", "bcType"]),
     // 倍数
     odds() {
       return toFixed((100 - 2) / this.target);
@@ -142,9 +179,17 @@ export default {
     // 奖金
     bonus() {
       return toFixed(multiple([this.odds, this.betting.current || 0]));
+    },
+    bt() {
+      return this.currencys ? this.currencys[this.bcType] : {};
     }
   },
   methods: {
+    // 修改币种
+    changeBcType(type) {
+      dicePanelService.changeBcType(type);
+    },
+    // 倍数点击
     multipleHandler(value) {
       this.betting.current = dicePanelService.computeBetting(
         this.betting.current,
@@ -152,29 +197,34 @@ export default {
         this.betting.max
       );
     },
+    // 监听目标点数
+    changeTarget(value) {
+      if(value > 96) this.target = 96;
+      if(value < 4) this.target = 4;
+    },
+    // 投注
     submit() {
-      this.closeSubmitModal();
-      // 接下来是走投注的流程
-      // 游戏准备中
-      this.game.status = 1;
-      // 游戏开始
-      setTimeout(() => {
-        this.game.status = 2;
-        this.setGameRandomNumber();
-      }, 2000);
-      // 游戏进行中
-      setTimeout(() => {
-        this.game.status = 0;
-        this.openResultModal();
-      }, 4000);
-    },
-    openSubmitModal() {
       if (this.game.status === 0) {
-        this.submitModal.show = dicePanelService.checkForm(this);
+        if (!this.betting.current) {
+          return this.$message({
+            message: this.$t("game.beetinIsNull"),
+            type: "warning"
+          });
+        }
+        // 接下来是走投注的流程
+        // 游戏准备中
+        this.game.status = 1;
+        // 游戏开始
+        setTimeout(() => {
+          this.game.status = 2;
+          this.setGameRandomNumber();
+        }, 2000);
+        // 游戏进行中
+        setTimeout(() => {
+          this.game.status = 0;
+          this.openResultModal();
+        }, 4000);
       }
-    },
-    closeSubmitModal() {
-      this.submitModal.show = false;
     },
     openResultModal() {
       this.resultModal.show = true;
@@ -190,6 +240,9 @@ export default {
           this.setGameRandomNumber();
         }
       }, 30);
+    },
+    openModal(type) {
+      this.$refs[`${type}Modal`].open();
     },
 
     //关于一些字符串的转换啊，hex转换的方法，都可以去https://github.com/ontio-community/Smartx-ide-components/blob/master/src/components/scIDE/Tool.vue ，这里找参考调用。
@@ -286,15 +339,27 @@ export default {
     },
     async recharge(fromUserScriptHash, toUserScript, amount) {
       //付款账户，充值给谁，充值的个数，需要修改，不能跑完成吧，需要容错处理和健壮性
-       //这里可以来一些检测，如账户的检测，是否都为20长度的字符串
-       const scriptHash = '95feeda3a7f41e43204353de64aa7b016e4ffaa3'; //合约的地址
-       const operation = 'Recharge';//调用合约的方法名
-       const args = [{type: 'Bytearray', value: fromUserScriptHash}, {type: 'Bytearray', value: toUserScript}, {type: 'Integer', value: amount}];
-       const gasPrice = 500;
-       const gasLimit = 200000;
-       const result = await client.api.smartContract.invoke({scriptHash, operation, args, gasPrice, gasLimit});
-       console.log(result);//大概1秒后再接下去请求。
-      const txlog = await client.api.network.getSmartCodeEvent(result['transaction']);//得到交易的状态，json里面有个notify
+      //这里可以来一些检测，如账户的检测，是否都为20长度的字符串
+      const scriptHash = "95feeda3a7f41e43204353de64aa7b016e4ffaa3"; //合约的地址
+      const operation = "Recharge"; //调用合约的方法名
+      const args = [
+        { type: "Bytearray", value: fromUserScriptHash },
+        { type: "Bytearray", value: toUserScript },
+        { type: "Integer", value: amount }
+      ];
+      const gasPrice = 500;
+      const gasLimit = 200000;
+      const result = await client.api.smartContract.invoke({
+        scriptHash,
+        operation,
+        args,
+        gasPrice,
+        gasLimit
+      });
+      console.log(result); //大概1秒后再接下去请求。
+      const txlog = await client.api.network.getSmartCodeEvent(
+        result["transaction"]
+      ); //得到交易的状态，json里面有个notify
       console.log(txlog);
     },
 
@@ -348,12 +413,14 @@ export default {
   padding: 30px;
   background-color: #1a1a1a;
   color: #fff;
-  // background: url(https://dice.eosbet.io/background.7418bc01c2269ba7e456.png) top left/contain;
 }
 .dice-panel {
   width: 800px;
   margin: 0 auto;
   // background-color: #fff;
+}
+.dice-types {
+  text-align: center;
 }
 .dice-attributes {
   display: flex;
@@ -372,13 +439,15 @@ export default {
   height: 100%;
   display: flex;
   & > span {
+    box-sizing: border-box;
     height: 40px;
     flex: 1;
-    margin: 0 2px;
+    margin-left: 2px;
     display: inline-block;
     text-align: center;
     line-height: 40px;
     font-size: 14px;
+    border: 1px solid #444;
     border-radius: 2px;
     cursor: pointer;
     &:hover {
@@ -422,5 +491,25 @@ export default {
 .dice-user {
   padding: 10px 0;
   text-align: center;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  font-size: 14px;
+}
+.balance-btn {
+  cursor: pointer;
+}
+.el-slider__runway {
+  height: 12px;
+  border-radius: 6px;
+  background-color: #353535;
+}
+.el-slider__bar {
+  height: 12px;
+  border-top-left-radius: 6px;
+  border-bottom-left-radius: 6px;
+}
+.el-slider__button-wrapper {
+  top: -12px;
 }
 </style>

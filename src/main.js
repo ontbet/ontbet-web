@@ -13,6 +13,8 @@ Vue.config.productionTip = false
 
 Vue.use(ElementUI);
 
+store.dispatch('getAccount')
+
 new Vue({
   i18n,
   store,

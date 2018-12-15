@@ -11,7 +11,7 @@
             <li class="nav-menu-item" @click="openModal('dividend')">{{$t('nav.dividend')}}</li>
             <li class="nav-menu-item" @click="openModal('help')">{{$t('nav.help')}}</li>
         </ul>
-        <el-popover
+        <!-- <el-popover
             v-if="loginStatus"
             placement="bottom"
             width="200"
@@ -22,8 +22,8 @@
                     <el-col :span="12"><el-button type="primary" style="width: 100%" @click="openModal('withdraw')">{{$t('btn.withdraw')}}</el-button></el-col>
                 </el-row>
             </div>
-            <span slot="reference" class="balance-btn">{{$t('nav.balance')}}: {{balance[btType]}} {{currencys[btType].name}}</span>
-        </el-popover>
+            <span slot="reference" class="balance-btn">{{$t('nav.balance')}}: {{balance[bcType]}} {{currencys[bcType].name}}</span>
+        </el-popover> -->
         <el-dropdown>
             <span class="language-btn">
                 {{$t('lang')}}<i class="el-icon-arrow-down el-icon--right"></i>
@@ -59,7 +59,7 @@ export default {
             'user',
             'balance',
             'loginStatus',
-            'btType',
+            'bcType',
             'currencys'
         ]),
     }
@@ -108,11 +108,5 @@ export default {
     font-size: 14px;
     color: #fff;
     cursor: pointer;
-}
-.balance-btn {
-    padding: 4px 5px 4px 0;
-    margin-right: 25px;
-    cursor: pointer;
-    font-size: 14px;
 }
 </style>

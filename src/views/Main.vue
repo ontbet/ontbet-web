@@ -5,10 +5,6 @@
     <help-modal ref="helpModal"></help-modal>
     <!-- 股息 -->
     <dividend-modal ref="dividendModal"></dividend-modal>
-    <!-- 提现 -->
-    <withdraw-modal ref="withdrawModal"></withdraw-modal>
-    <!-- 充值 -->
-    <recharge-modal ref="rechargeModal"></recharge-modal>
 
     <div id="nav">
       <nav-header 
@@ -27,8 +23,6 @@ import DicePanel from '@/components/DicePanel'
 import BettingPanel from '@/components/BettingPanel'
 import HelpModal from '@/components/HelpModal'
 import DividendModal from '@/components/DividendModal'
-import WithdrawModal from '@/components/WithdrawModal'
-import RechargeModal from '@/components/RechargeModal'
 import { client } from 'ontology-dapi';
 
 
@@ -38,9 +32,7 @@ export default {
     DicePanel,
     BettingPanel,
     HelpModal,
-    DividendModal,
-    WithdrawModal,
-    RechargeModal
+    DividendModal
   },
   methods: {
   

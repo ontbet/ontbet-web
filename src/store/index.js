@@ -6,7 +6,12 @@ import {
     USER,
     BALANCE,
     BT_TYPE,
-    CURRENCYS
+    CURRENCYS,
+    CONTRACT_HASH,
+    ADDRESS,
+    SCRIPT_HASH,
+    EMPTY_USER,
+    ACCOUNT
 } from './types'
 
 Vue.use(Vuex)
@@ -17,15 +22,20 @@ export default new Vuex.Store({
         user: {
             name: '张三',
             address: '64f75b59554a2008bcc1a87a7ae09249abc74a91',
-            scripthash: '95feeda3a7f41e43204353de64aa7b016e4ffaa3'
+            scriptHash: '95feeda3a7f41e43204353de64aa7b016e4ffaa3'
         },
+        account: '',
+        address: '',
+        scriptHash: '',
+        // 合约hash
+        contractHash: config.contractHash,
         balance: {
-            'TONT': 2,
-            'ONG': 100,
-            'TNT': 7.32
+            'TONT': 0,
+            'ONG': 0,
+            'TNT': 0
         },
         // 币种类型
-        btType: 'TONT',
+        bcType: 'TONT',
         // 币种合集
         currencys: {
             'TONT': {
@@ -43,50 +53,91 @@ export default new Vuex.Store({
                 min: 10,
                 max: 10000
             }
-        },
+        }
     },
     mutations: {
-        [LOGIN_STATUS]({
-            state
-        }, data) {
+        [LOGIN_STATUS](state, data) {
             state.loginStatus = data;
         },
-        [USER]({
-            state
-        }, data) {
-            state.login = data;
+        [USER](state, data) {
+            state.user = data;
         },
-        [BALANCE]({
-            state
-        }, data) {
+        [ACCOUNT](state, payload) {
+            state.account = payload.account;
+        },
+        [ADDRESS](state, payload) {
+            state.address = payload.address;
+        },
+        [SCRIPT_HASH](state, payload) {
+            state.scriptHash = payload.scriptHash;
+        },
+        [BALANCE](state, data) {
             state.balance = data;
         },
-        [BT_TYPE]({
-            state
-        }, data) {
-            state.btType = data;
+        [BT_TYPE](state, data) {
+            state.bcType = data;
         },
-        [CURRENCYS]({
-            state
-        }, data) {
+        [CURRENCYS](state, data) {
             state.currencys = data;
+        },
+        [CONTRACT_HASH](state, data) {
+            state.contractHash = data;
+        },
+        [EMPTY_USER](state) {
+            state.loginStatus = false;
+            state.user = {};
+            state.address = '';
+            state.scriptHash = '';
+            state.balance = {
+                'TONT': 0,
+                'ONG': 0,
+                'TNT': 0
+            };
         }
     },
     actions: {
-        getUserInfo({
+        getAccount({
+            commit,
+            dispatch,
+        }) {
+            userService.getAccount().then(res => {
+                commit(LOGIN_STATUS, true)
+                commit(ACCOUNT, res)
+                commit(ADDRESS, res)
+                commit(SCRIPT_HASH, res)
+                dispatch('getBalance')
+                return userService.getBalance(res.address)
+            }).then(res => {
+                commit(BALANCE, res)
+            }).catch(err => {
+                console.log(err);
+                commit(EMPTY_USER)
+            })
+        },
+        getBalance({
+            commit,
+            state
+        }) {
+            userService.getTont(state.contractHash, state.scriptHash).then(res => {
+                console.log(res);
+            })
+        },
+        // 获取hash地址
+        getHash({
             commit
         }) {
-            const user = userService.getUserInfo();
-            commit(USER, user);
-            commit(BALANCE, userService.getBalance());
-            commit(LOGIN_STATUS, user)
+            commit(HASH, '测试hash数据')
         }
     },
     getters: {
         loginStatus: state => state.loginStatus,
         user: state => state.user,
+        account: state => state.account,
+        address: state => state.address,
+        scriptHash: state => state.scriptHash,
         balance: state => state.balance,
-        btType: state => state.btType,
-        currencys: state => state.currencys
+        bcType: state => state.bcType,
+        currencys: state => state.currencys,
+        contractHash: state => state.contractHash
     }
 })

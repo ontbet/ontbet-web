@@ -1,18 +1,21 @@
 <template>
-  <el-dialog :title="$t('modal.withdraw')" width="400px" :visible.sync="show">
+  <el-dialog :title="$t('modal.withdraw')"
+    width="400px" 
+    :visible.sync="show"
+    :close-on-click-modal="false">
     <div class="result-number">{{value}} (TONT) = {{result}} (ONT)</div>
     <el-input-number
       v-model="value"
       :step="1"
       :controls="false"
-      :precision="2"
+      :precision="0"
       :min="0"
       :max="10000"
       style="width: 100%"
     ></el-input-number>
     <span slot="footer">
       <el-button @click="close">{{$t('btn.cancel')}}</el-button>
-      <el-button type="primary" @click="submit">{{$t('btn.ok')}}</el-button>
+      <el-button type="primary" @click="submit" :loading="loading">{{loading ? '提现中' : $t('btn.ok')}}</el-button>
     </span>
   </el-dialog>
 </template>
@@ -28,6 +31,7 @@ export default {
   data() {
     return {
       show: false,
+      loading: false,
       value: 0,
       form: {
         value: 0
@@ -40,9 +44,16 @@ export default {
       this.show = true;
     },
     close() {
-      this.show = close;
+      this.show = false;
     },
     submit() {
+        if(!this.value) {
+          return this.$message({
+            message: this.$t('message.rechargeNull'),
+            type: 'warning'
+          });
+        }
+        this.loading = true;
         let TONT_DRGREE = 10 ^ 8
         this.GetUserInfo().then(() => {
         this.Withdraw(
@@ -116,9 +127,9 @@ export default {
     }
   },
   computed: {
-    ...mapGetters(["user", "balance", "loginStatus", "btType", "currencys"]),
+    ...mapGetters(["user", "balance", "loginStatus", "bcType", "currencys"]),
     result() {
-      return toFixed(multiple([this.value || 0, 2]));
+      return (this.value || 0) * 1;
     }
   }
 };
