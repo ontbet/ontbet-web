@@ -1,6 +1,6 @@
 import mathjs from 'mathjs'
 import { Message } from 'element-ui'
-
+let Ont = require('ontology-ts-sdk');
 /**
  * 四舍五入
  * @param {*} num 
@@ -27,4 +27,15 @@ export function showMsg(msg = '无内容', type = 'warring') {
         message: msg,
         type: type
     })
+}
+
+export function ReverHexNumberToNumber(hexnumber){
+    let BigNumber = require('bignumber.js');
+    let util = Ont.utils
+    let num = util.reverseHex(hexnumber)
+   
+    num = new BigNumber(num,16)
+
+    //console.log(num)
+    return num
 }

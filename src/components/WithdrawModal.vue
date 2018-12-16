@@ -75,24 +75,27 @@ export default {
       }
       this.loading = true;
       let TONT_DRGREE = 10 ^ 8;
-      userService.getAccount().then(res => {
-        this.withdraw(this.scriptHash, this.value * 100000000);
-      }).catch(err => {
-        console.log('未获取钱包信息');
-      })
+      userService
+        .getAccount()
+        .then(res => {
+          this.withdraw(this.scriptHash, this.value * 100000000);
+        })
+        .catch(err => {
+          console.log("未获取钱包信息");
+        });
     },
 
     withdraw(formUser, amount) {
       const scriptHash = this.contractHash; //合约的地址
       const operation = "Withdraw"; //调用合约的方法名
       const args = [
-        { type: "Bytearray", value: formUser },
+        { type: "ByteArray", value: formUser },
         { type: "Integer", value: amount }
       ];
       const gasPrice = 500;
       const gasLimit = 200000;
       client.api.smartContract
-        .invoke({scriptHash, operation, args, gasPrice, gasLimit})
+        .invoke({ scriptHash, operation, args, gasPrice, gasLimit })
         .then(
           result => {
             setTimeout(() => {
@@ -105,10 +108,31 @@ export default {
                   value: txid.toString()
                 })
                 .then(
-                  err => {
-                    console.log(err); //得到交易的状态，json里面有个notify
-                    //取txlogjson文件中的最终信息，来看，结果，然后给界面上相应响应，主要看NOtify中对应的自己合约的东西。
-                    //对应自己的合约hash里面没有error的信息，就代表成功，
+                  res => {
+                    console.log("交易完成");
+                    console.log(res); //得到交易的状态，json里面有个notify
+                    const notify = res.Notify;
+                    const successLength = notify.filter(item => {
+                      return (
+                        item.ContractAddress === this.contractHash &&
+                        item.States.filter(citem => citem === "73756363657373")
+                          .length
+                      );
+                    }).length;
+                    const errors = notify.filter(item => {
+                      return item.States.filter(citem => citem === "6572726f72")
+                        .length;
+                    });
+                    console.log(successLength);
+                    if (successLength) {
+                      showMsg(this.$t("message.withdrawSuccess"), "success");
+                    } else {
+                      const msg = "提现失败";
+                      if (errors.length) {
+                        msg = $t("message.errorCode" + errors[0][1]);
+                      }
+                      showMsg(msg);
+                    }
                   },
                   err => {
                     console.log(err); //这里可能是网络原因或者交易还没被执行，还没有结果会到这里。
@@ -118,11 +142,13 @@ export default {
           },
           err => {
             console.log(err);
-            if (err == "CANCELED") {
-              //用户在主动取消的，点击了cancel按钮的情况
-            }
+             if (err == "CANCELED") {
+          showMsg(this.$t('message.rechargeCanel'))
+        } else {
+          showMsg(this.$t('message.rechargeError'))
+        }
           }
-        );
+        ).finally(() => this.close());
     }
   }
 };

@@ -45,6 +45,24 @@ export default {
             args
         }); //得到banlanceTONT返回的调用结果，结果返回的是一个hexstring的int，需要转换一下。
         return result;
+    },
+
+     /**
+     * 获取TONT余额
+     * @param {*} chash 合约hash
+     * @param {*} uhash 用户hash - scriptHash
+     */
+    async getTNT(chash, uhash) {
+        const args = [{
+            type: "ByteArray",
+            value: uhash
+        }];
+        const result = await client.api.smartContract.invokeRead({
+            scriptHash: chash,
+            operation: 'banlanceof',
+            args
+        }); //得到banlanceTONT返回的调用结果，结果返回的是一个hexstring的int，需要转换一下。
+        return result;
     }
 
 }

@@ -1,6 +1,7 @@
 import Vue from 'vue'
 import Vuex from 'vuex'
 import userService from '@/services/user'
+import {ReverHexNumberToNumber} from '@/utils/util'
 import {
     LOGIN_STATUS,
     USER,
@@ -30,6 +31,7 @@ export default new Vuex.Store({
         scriptHash: '',
         // 合约hash
         contractHash: config.contractHash,
+        TNTcontractHash:config.TNTcontractHash,
         balance: {
             'TONT': 0,
             'ONG': 0,
@@ -41,13 +43,14 @@ export default new Vuex.Store({
         currencys: {
             'TONT': {
                 name: 'TONT',
-                min: 0.1,
-                max: 10000
+                min: 1,
+                max: 100,
+                degree:100000000
             },
             'ONG': {
                 name: 'ONG',
-                min: 0.1,
-                max: 10000
+                min: 1,
+                max: 100
             },
             'TNT': {
                 name: 'TNT',
@@ -97,6 +100,9 @@ export default new Vuex.Store({
         },
         [TONT](state, data = 0) {
             state.balance['TONT'] = data;
+        },
+        [TNT](state, data = 0) {
+            state.balance['TNT'] = data;
         }
 
     },
@@ -126,10 +132,35 @@ export default new Vuex.Store({
             userService.getTont(state.contractHash, state.scriptHash).then(res => {
                 console.log(res);
                 // 处理返回的TONT数量
-                commit(TONT, res)
+                let tontbanlance = ReverHexNumberToNumber(res)
+                //console.log('1'+this.state.TONT.degree)
+                tontbanlance = tontbanlance.div(100000000)
+                tontbanlance = Number(tontbanlance.toString(10))
+                commit(TONT, tontbanlance)
             }).catch(err => {
+                console.log(err)
                 commit(TONT, 0)
             })
+        },
+        getTNT(
+            {
+                commit,
+                state
+            }
+        ){
+            userService.getTNT(state.TNTcontractHash, state.scriptHash).then(res => {
+                console.log(res);
+                // 处理返回的TONT数量
+                let tntbanlance = ReverHexNumberToNumber(res)
+                //console.log('1'+this.state.TONT.degree)
+                tntbanlance = tntbanlance.div(100000000)
+                tntbanlance = Number(tntbanlance.toString(10))
+                commit(TNT, tntbanlance)
+            }).catch(err => {
+                console.log(err)
+                commit(TNT, 0)
+            })
+
         }
     },
     getters: {
