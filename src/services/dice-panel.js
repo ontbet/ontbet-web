@@ -93,7 +93,7 @@ export default {
       tokentype,
       number,
       amount,
-      inviterScriptHash
+      inviterScriptHash = fromUserScriptHash
   ) {
 
     const MAX_NUMBER = 95;
@@ -126,7 +126,7 @@ export default {
       { type: "Integer", value: tokentype },
       { type: "Integer", value: number },
       { type: "Integer", value: amount },
-      { type: "ByteArray", value: fromUserScriptHash }
+      { type: "ByteArray", value: inviterScriptHash }
     ]; //合约的参数
 
     const gasPrice = 500;
