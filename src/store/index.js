@@ -2,18 +2,20 @@ import Vue from 'vue'
 import Vuex from 'vuex'
 import userService from '@/services/user'
 import {ReverHexNumberToNumber} from '@/utils/util'
+import config from '../config'
 import {
-    LOGIN_STATUS,
-    USER,
-    BALANCE,
-    BT_TYPE,
-    CURRENCYS,
-    CONTRACT_HASH,
-    ADDRESS,
-    SCRIPT_HASH,
-    EMPTY_USER,
-    ACCOUNT,
-    TONT
+  LOGIN_STATUS,
+  USER,
+  BALANCE,
+  BT_TYPE,
+  CURRENCYS,
+  CONTRACT_HASH,
+  ADDRESS,
+  SCRIPT_HASH,
+  EMPTY_USER,
+  ACCOUNT,
+  TONT,
+  TNT
 } from './types'
 
 Vue.use(Vuex)
@@ -31,7 +33,7 @@ export default new Vuex.Store({
         scriptHash: '',
         // 合约hash
         contractHash: config.contractHash,
-        TNTcontractHash:config.TNTcontractHash,
+        TNTcontractHash: config.TNTcontractHash,
         balance: {
             'TONT': 0,
             'ONG': 0,
@@ -142,12 +144,10 @@ export default new Vuex.Store({
                 commit(TONT, 0)
             })
         },
-        getTNT(
-            {
-                commit,
-                state
-            }
-        ){
+        getTNT({
+            commit,
+            state
+        }) {
             userService.getTNT(state.TNTcontractHash, state.scriptHash).then(res => {
                 console.log(res);
                 // 处理返回的TONT数量

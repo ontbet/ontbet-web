@@ -39,3 +39,10 @@ export function ReverHexNumberToNumber(hexnumber){
     //console.log(num)
     return num
 }
+
+
+export function sleep(time){
+    return new Promise(((resolve) => {
+        window.setTimeout(resolve, time);
+    }))
+}
