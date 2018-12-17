@@ -241,7 +241,7 @@ export default {
 
     const TNT_DEGREE = 10000000000; //币种的精度，最好这里变成biginter来计算，免得JS不支持那么大的数计算,这里可以弄成全局变量
     const ONG_DEGREE = 1000000000;
-    const TONT_DEGREE = 1000000000;
+    const TONT_DEGREE = 100000000;
 
     //把小数转换为整数，因为ONT区块链不支持小数，只能通过放大的方式来，实现小数
     if (tokentype === btCode.ONT) {
@@ -259,6 +259,7 @@ export default {
       //核对一下，下注的范围，还要考虑一下，这里也不能是小数
       return;
     }
+    console.log(number)
     const scriptHash = this.contractHash; //合约的地址
     const operation = "Guess"; //调用合约的方法名
     const args = [

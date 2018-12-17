@@ -100,25 +100,29 @@ export default {
             res => {
               console.log('交易完成');
               console.log(res); //得到交易的状态，json里面有个notify
-              const notify = res.Notify;
-              const successLength = notify.filter(item => {
-                return item.ContractAddress === this.contractHash && item.States.filter(citem => citem === '73756363657373').length;
-              }).length;
-              const errors = notify.filter(item => {
-                return item.States.filter(citem => citem === '6572726f72').length;
-              });
-              console.log(successLength);
-              if(successLength) {
+              let notify = res.Notify;
+
+              for(let i = 0;i < notify.length;i++){
+            if(notify[i].ContractAddress == this.contractHash){
+              let states = notify[i].States
+
+              if(states[0] == '73756363657373'){
                 showMsg(this.$t('message.rechargeSuccess'), 'success')
-              } else {
-                const msg = '充值失败';
-                if(errors.length) {
-                  msg = $t('message.errorCode' + errors[0][1]);
-                }
-                showMsg(msg)
+                return
               }
-              //取txlogjson文件中的最终信息，来看，结果，然后给界面上相应响应，主要看NOtify中对应的自己合约的东西。
-              //对应自己的合约hash里面没有error的信息，就代表成功，
+              if(states[0] == '73756363657373'){
+
+                 msg = $t('message.errorCode' + parseInt(states[1],16))
+                 showMsg(msg)
+                 return
+              }
+
+              }
+
+            }
+
+              const msg = '充值失败';
+              showMsg(msg)
             },
             err => {
               console.log(err); //这里可能是网络原因,或者交易还没被执行，还没有结果会到这里。
