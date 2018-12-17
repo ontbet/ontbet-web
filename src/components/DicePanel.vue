@@ -11,7 +11,7 @@
         <el-button type="primary" @click="closeResultModal">{{$t('btn.ok')}}</el-button>
       </span>
     </el-dialog>
-    
+
     <div class="dice-panel">
       <div class="dice-types">
         <el-button
@@ -92,6 +92,7 @@
       <div class="dice-user">
         <template v-if="loginStatus">
           <el-popover
+            v-if="bcType === 'TONT'"
             placement="bottom"
             width="200"
             trigger="hover"
@@ -120,6 +121,7 @@
               slot="reference"
             >{{$t('nav.balance')}}: {{balance[bcType]}} {{currencys[bcType].name}}</span>
           </el-popover>
+          <span v-else style="flex: 1">{{$t('nav.balance')}}: {{balance[bcType]}} {{currencys[bcType].name}}</span>
           <el-button
             :loading="game.status === 1"
             type="primary"
@@ -129,9 +131,9 @@
             <template v-if="game.status === 2">{{game.randomNumber}}</template>
             <template v-else>{{$t("btn.submit")}}</template>
           </el-button>
-          <span style="flex: 1"> 100 TNT</span>
+          <span style="flex: 1">100 TNT</span>
         </template>
-        <el-button v-else type="primary" @click="test">{{$t("btn.login")}}</el-button>
+        <el-button v-else type="primary" @click="login">{{$t("btn.login")}}</el-button>
       </div>
       <div class="dice-remark">
         <span>{{$t('message.dice')}}</span>
@@ -143,7 +145,7 @@
 <script>
 import { mapGetters } from "vuex";
 import { client } from "ontology-dapi";
-import { toFixed, multiple,showMsg } from "@/utils/util";
+import { toFixed, multiple, showMsg } from "@/utils/util";
 import dicePanelService from "@/services/dice-panel";
 import WithdrawModal from "@/components/WithdrawModal";
 import RechargeModal from "@/components/RechargeModal";
@@ -173,11 +175,19 @@ export default {
         status: 0,
         randomNumber: 0
       },
-      Address: "",
+      Address: ""
     };
   },
   computed: {
-    ...mapGetters(["user", "balance", "loginStatus","contractHash", "currencys", "bcType", "scriptHash"]),
+    ...mapGetters([
+      "user",
+      "balance",
+      "loginStatus",
+      "contractHash",
+      "currencys",
+      "bcType",
+      "scriptHash"
+    ]),
     // 倍数
     odds() {
       return toFixed((100 - 2) / this.target);
@@ -205,8 +215,8 @@ export default {
     },
     // 监听目标点数
     changeTarget(value) {
-      if(value > 96) this.target = 96;
-      if(value < 2) this.target = 2;
+      if (value > 96) this.target = 96;
+      if (value < 2) this.target = 2;
     },
     // 投注
     async submit() {
@@ -223,7 +233,12 @@ export default {
         // 游戏开始
         this.game.status = 2;
         this.setGameRandomNumber();
-        this.guess(this.scriptHash, btCode[this.bcType], this.target, this.betting.current);
+        this.guess(
+          this.scriptHash,
+          btCode[this.bcType],
+          this.target,
+          this.betting.current
+        );
         //this.game.status = 0;
         //this.openResultModal();
       }
@@ -234,106 +249,104 @@ export default {
       number,
       amount,
       inviterScriptHash = fromUserScriptHash
-  ) {
+    ) {
+      const MAX_NUMBER = 96;
+      const MIN_NUMBER = 2;
 
-    const MAX_NUMBER = 96;
-    const MIN_NUMBER = 2;
+      const TNT_DEGREE = 10000000000; //币种的精度，最好这里变成biginter来计算，免得JS不支持那么大的数计算,这里可以弄成全局变量
+      const ONG_DEGREE = 1000000000;
+      const TONT_DEGREE = 1000000000;
 
-    const TNT_DEGREE = 10000000000; //币种的精度，最好这里变成biginter来计算，免得JS不支持那么大的数计算,这里可以弄成全局变量
-    const ONG_DEGREE = 1000000000;
-    const TONT_DEGREE = 1000000000;
-
-    //把小数转换为整数，因为ONT区块链不支持小数，只能通过放大的方式来，实现小数
-    if (tokentype === btCode.ONT) {
-      //ONT不能投注，必须得充值转换为TONT，才能下注
-      return;
-    } else if (tokentype === btCode.TNT) {
-      amount = amount * TNT_DEGREE;
-    } else if (tokentype === btCode.TONT) {
-      amount = amount * TONT_DEGREE;
-    } else if (tokentype === btCode.ONG) {
-      amount = amount * ONG_DEGREE;
-    }
-
-    if (number < MIN_NUMBER || number > MAX_NUMBER) {
-      //核对一下，下注的范围，还要考虑一下，这里也不能是小数
-      return;
-    }
-    const scriptHash = this.contractHash; //合约的地址
-    const operation = "Guess"; //调用合约的方法名
-    const args = [
-      { type: "ByteArray", value: fromUserScriptHash },
-      { type: "Integer", value: tokentype },
-      { type: "Integer", value: number },
-      { type: "Integer", value: amount },
-      { type: "ByteArray", value: inviterScriptHash }
-    ]; //合约的参数
-
-    const gasPrice = 500;
-    const gasLimit = 200000;
-    client.api.smartContract.invoke({
-      scriptHash,
-      operation,
-      args,
-      gasPrice,
-      gasLimit
-    }).then(
-      res =>{
-      console.log(res["transaction"])
-      let txid = res["transaction"]
-      client.api.network.getSmartCodeEvent({value: txid.toString()}).then(
-        res2 =>{
-          console.log(res2)
-          let notify = res2.Notify;
-          //console.log(notify)
-          for(let i = 0;i < notify.length;i++){
-            if(notify[i].ContractAddress == this.contractHash){
-              console.log(notify[i].States)
-              let states = notify[i].States
-
-              if(states[0] == "6775657373"){
-                let sysnumber = parseInt(states[6],16)
-                let mynumber =  parseInt(states[5],16)
-                console.log(sysnumber)
-                if (mynumber > sysnumber){
-                  console.log("win")
-                }else
-                {
-                  console.log("lose")
-                }
-                this.game.status = 0;
-                return
-              }
-
-              if(states[0] == "6572726f72"){
-                  console.log("error")
-                  this.game.status = 0;
-              }
-
-               
-            }
-          }
-
-          this.game.status = 0;
-        },
-        err =>{
-          console.log(err)
-          this.game.status = 0;
-        }
-      )
-      },
-      err =>{
-       if (err == "CANCELED") {
-          showMsg(this.$t('message.rechargeCanel'))
-        } else {
-          showMsg(this.$t('message.rechargeError'))//这里要改一下
-        }
-        this.game.status = 0;
+      //把小数转换为整数，因为ONT区块链不支持小数，只能通过放大的方式来，实现小数
+      if (tokentype === btCode.ONT) {
+        //ONT不能投注，必须得充值转换为TONT，才能下注
+        return;
+      } else if (tokentype === btCode.TNT) {
+        amount = amount * TNT_DEGREE;
+      } else if (tokentype === btCode.TONT) {
+        amount = amount * TONT_DEGREE;
+      } else if (tokentype === btCode.ONG) {
+        amount = amount * ONG_DEGREE;
       }
-    ); //向区块链节点发送该交易，会返回该次交易的hash
 
+      if (number < MIN_NUMBER || number > MAX_NUMBER) {
+        //核对一下，下注的范围，还要考虑一下，这里也不能是小数
+        return;
+      }
+      const scriptHash = this.contractHash; //合约的地址
+      const operation = "Guess"; //调用合约的方法名
+      const args = [
+        { type: "ByteArray", value: fromUserScriptHash },
+        { type: "Integer", value: tokentype },
+        { type: "Integer", value: number },
+        { type: "Integer", value: amount },
+        { type: "ByteArray", value: inviterScriptHash }
+      ]; //合约的参数
 
-  },
+      const gasPrice = 500;
+      const gasLimit = 200000;
+      client.api.smartContract
+        .invoke({
+          scriptHash,
+          operation,
+          args,
+          gasPrice,
+          gasLimit
+        })
+        .then(
+          res => {
+            console.log(res["transaction"]);
+            let txid = res["transaction"];
+            client.api.network
+              .getSmartCodeEvent({ value: txid.toString() })
+              .then(
+                res2 => {
+                  console.log(res2);
+                  let notify = res2.Notify;
+                  //console.log(notify)
+                  for (let i = 0; i < notify.length; i++) {
+                    if (notify[i].ContractAddress == this.contractHash) {
+                      console.log(notify[i].States);
+                      let states = notify[i].States;
+
+                      if (states[0] == "6775657373") {
+                        let sysnumber = parseInt(states[6], 16);
+                        let mynumber = parseInt(states[5], 16);
+                        console.log(sysnumber);
+                        if (mynumber > sysnumber) {
+                          console.log("win");
+                        } else {
+                          console.log("lose");
+                        }
+                        this.game.status = 0;
+                        return;
+                      }
+
+                      if (states[0] == "6572726f72") {
+                        console.log("error");
+                        this.game.status = 0;
+                      }
+                    }
+                  }
+
+                  this.game.status = 0;
+                },
+                err => {
+                  console.log(err);
+                  this.game.status = 0;
+                }
+              );
+          },
+          err => {
+            if (err == "CANCELED") {
+              showMsg(this.$t("message.rechargeCanel"));
+            } else {
+              showMsg(this.$t("message.rechargeError")); //这里要改一下
+            }
+            this.game.status = 0;
+          }
+        ); //向区块链节点发送该交易，会返回该次交易的hash
+    },
     openResultModal() {
       this.resultModal.show = true;
     },
@@ -352,6 +365,9 @@ export default {
     openModal(type) {
       this.$refs[`${type}Modal`].open();
     },
+    login() {
+      console.log("去登录");
+    }
   }
 };
 </script>

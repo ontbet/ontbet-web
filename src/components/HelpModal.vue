@@ -9,7 +9,6 @@
             <p>6、调整滑条投注骰子号码上限，改变胜出机率</p>
             <p>7、按下"掷骰子"按钮进行投注，如果 摇到骰子号码小于投注骰子号码上限，立即中奖</p>
             <p>由于游戏都在Ontology 的智能合约上执，因此游戏保证公平，并不能作弊。我们透过独有的加密技术，保证赛果不会被更改，请您放心下注。</p>
-            <div class="help-certification-wrap"><el-button type="primary">Verify</el-button></div>
         </div>
         <div slot="footer"><el-button type="primary">Verify</el-button></div>
     </el-dialog>

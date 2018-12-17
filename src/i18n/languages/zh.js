@@ -1,10 +1,12 @@
 export default {
     lang: '中文',
+    copy: '复制',
     nav: {
         disc: '骰子',
         help: '帮助',
         dividend: '股息',
-        balance: '余额'
+        balance: '余额',
+        invite: '邀请好友'
     },
     game: {
         beetinIsNull: '请填写投注金额',

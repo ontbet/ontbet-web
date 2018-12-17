@@ -23,7 +23,7 @@
 </template>
 
 <script>
-import { mapGetters } from "vuex";
+import { mapGetters, mapActions } from "vuex";
 import { toFixed, multiple, showMsg } from "@/utils/util";
 import { client } from "ontology-dapi";
 import userService from '@/services/user'
@@ -55,6 +55,7 @@ export default {
     }
   },
   methods: {
+    ...mapActions(['getBalance']),
     open() {
       this.value = 0;
       this.show = true;
@@ -68,11 +69,7 @@ export default {
         return this.showMsg(this.$t("message.rechargeNull"));
       }
       this.loading = true;
-      userService.getAccount().then(res => {
-        this.recharge(this.scriptHash, this.scriptHash, this.value);
-      }).catch(err => {
-        console.log('未获取钱包信息');
-      })
+      this.recharge(this.scriptHash, this.scriptHash, this.value);
     },
 
     recharge(from, to, amount) {
@@ -90,16 +87,16 @@ export default {
       client.api.smartContract
         .invoke({scriptHash, operation, args, gasPrice, gasLimit})
         .then(result => {
-        // setTimeout(() => {
-          console.log('交易发送成功');
-          console.log(2);
-          console.log(result);
-          console.log(result["transaction"]);
+          // setTimeout(() => {
+          // console.log('交易发送成功');
+          // console.log(2);
+          // console.log(result);
+          // console.log(result["transaction"]);
           let txid = result["transaction"]; //这里需要判断一下，是否成功什么的。
           client.api.network.getSmartCodeEvent({ value: txid.toString()}).then(
             res => {
-              console.log('交易完成');
-              console.log(res); //得到交易的状态，json里面有个notify
+              // console.log('交易完成');
+              // console.log(res); //得到交易的状态，json里面有个notify
               const notify = res.Notify;
               const successLength = notify.filter(item => {
                 return item.ContractAddress === this.contractHash && item.States.filter(citem => citem === '73756363657373').length;
@@ -107,11 +104,12 @@ export default {
               const errors = notify.filter(item => {
                 return item.States.filter(citem => citem === '6572726f72').length;
               });
-              console.log(successLength);
+              // console.log(successLength);
               if(successLength) {
                 showMsg(this.$t('message.rechargeSuccess'), 'success')
+                this.getBalance();
               } else {
-                const msg = '充值失败';
+                let msg = '充值失败';
                 if(errors.length) {
                   msg = $t('message.errorCode' + errors[0][1]);
                 }
