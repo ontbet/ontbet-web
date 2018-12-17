@@ -35,32 +35,6 @@ export default {
     DividendModal
   },
   methods: {
-  
-    async withdraw() {
-      const scriptHash = '95feeda3a7f41e43204353de64aa7b016e4ffaa3';
-      const operation = 'Withdraw';
-      const args = [{type: 'Bytearray', value: scriptHash}, {type: 'Integer', value: 5}];
-      const gasPrice = 500;
-      const gasLimit = 200000;
-      const result = await client.api.smartContract.invoke({scriptHash, operation, args, gasPrice, gasLimit});
-      console.log(result);
-    },
-    async recharge() {
-      const scriptHash = '95feeda3a7f41e43204353de64aa7b016e4ffaa3';
-      const operation = 'Recharge';
-      const args = [{type: 'Bytearray', value: scriptHash}, {type: 'Bytearray', value: scriptHash}, {type: 'Integer', value: 5}];
-      const gasPrice = 500;
-      const gasLimit = 200000;
-      const result = await client.api.smartContract.invoke({scriptHash, operation, args, gasPrice, gasLimit});
-      console.log(result);
-    },
-    async banlanceTONT() {
-      const scriptHash = '95feeda3a7f41e43204353de64aa7b016e4ffaa3';
-      const operation = 'banlanceTONT';
-      const args = [{type: 'Bytearray', value: scriptHash}, {type: 'Bytearray', value: scriptHash}, {type: 'Integer', value: 5}];
-      const result = await client.api.smartContract.invokeRead({scriptHash, operation, args});
-      console.log(result);
-    },
     openModal(type) {
       this.$refs[`${type}Modal`].open();
     }
