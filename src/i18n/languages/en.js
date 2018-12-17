@@ -1,10 +1,12 @@
 export default {
     lang: 'English',
+    copy: 'Copy',
     nav: {
         disc: 'Disc',
         help: 'Help',
         dividend: 'Dividend',
-        balance: 'Balance'
+        balance: 'Balance',
+        invite: 'Invite friends'
     },
     game: {
         beetinIsNull: 'Please fill in the bet amount',

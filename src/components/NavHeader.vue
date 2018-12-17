@@ -9,7 +9,7 @@
         <ul class="nav-menu">
             <li class="nav-menu-item active">{{$t('nav.disc')}}</li>
             <li class="nav-menu-item" @click="openModal('dividend')">{{$t('nav.dividend')}}</li>
-            <li class="nav-menu-item" @click="openModal('invite')">{{$t('nav.invite')}}</li>
+            <li class="nav-menu-item" @click="openModal('invite')" v-if="loginStatus">{{$t('nav.invite')}}</li>
             <li class="nav-menu-item" @click="openModal('help')">{{$t('nav.help')}}</li>
         </ul>
         <!-- <el-popover
@@ -61,7 +61,8 @@ export default {
             'balance',
             'loginStatus',
             'bcType',
-            'currencys'
+            'currencys',
+            'loginStatus'
         ]),
     }
 }

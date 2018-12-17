@@ -5,6 +5,8 @@
     <help-modal ref="helpModal"></help-modal>
     <!-- 股息 -->
     <dividend-modal ref="dividendModal"></dividend-modal>
+    <!-- 邀请好友 -->
+    <invite-modal ref="inviteModal"></invite-modal>
 
     <div id="nav">
       <nav-header 
@@ -23,6 +25,7 @@ import DicePanel from '@/components/DicePanel'
 import BettingPanel from '@/components/BettingPanel'
 import HelpModal from '@/components/HelpModal'
 import DividendModal from '@/components/DividendModal'
+import InviteModal from '@/components/InviteModal'
 import { client } from 'ontology-dapi';
 
 
@@ -32,7 +35,8 @@ export default {
     DicePanel,
     BettingPanel,
     HelpModal,
-    DividendModal
+    DividendModal,
+    InviteModal
   },
   methods: {
     openModal(type) {

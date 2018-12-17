@@ -27,7 +27,7 @@
 </template>
 
 <script>
-import { mapGetters } from "vuex";
+import { mapGetters, mapActions } from "vuex";
 import { toFixed, multiple, showMsg } from "@/utils/util";
 import { client } from "ontology-dapi";
 import userService from "@/services/user";
@@ -61,6 +61,7 @@ export default {
     }
   },
   methods: {
+    ...mapActions(['getBalance']),
     open() {
       this.value = 0;
       this.show = true;
@@ -99,9 +100,9 @@ export default {
         .then(
           result => {
             setTimeout(() => {
-              console.log(2);
-              console.log(result);
-              console.log(result["transaction"]);
+              // console.log(2);
+              // console.log(result);
+              // console.log(result["transaction"]);
               let txid = result["transaction"]; //这里需要判断一下，是否成功什么的。
               client.api.network
                 .getSmartCodeEvent({
@@ -109,8 +110,8 @@ export default {
                 })
                 .then(
                   res => {
-                    console.log("交易完成");
-                    console.log(res); //得到交易的状态，json里面有个notify
+                    // console.log("交易完成");
+                    // console.log(res); //得到交易的状态，json里面有个notify
                     const notify = res.Notify;
                     const successLength = notify.filter(item => {
                       return (
@@ -123,11 +124,11 @@ export default {
                       return item.States.filter(citem => citem === "6572726f72")
                         .length;
                     });
-                    console.log(successLength);
                     if (successLength) {
                       showMsg(this.$t("message.withdrawSuccess"), "success");
+                      this.getBalance();
                     } else {
-                      const msg = "提现失败";
+                      let msg = "提现失败";
                       if (errors.length) {
                         msg = $t("message.errorCode" + errors[0][1]);
                       }

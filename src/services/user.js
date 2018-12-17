@@ -23,7 +23,6 @@ export default {
      * @param {*} address 
      */
     async getBalance(address) {
-        console.log(client.api);
         return await client.api.network.getBalance({
             address: address
         });
@@ -34,7 +33,7 @@ export default {
      * @param {*} chash 合约hash
      * @param {*} uhash 用户hash - scriptHash
      */
-    async getTont(chash, uhash) {
+    async getTONT(chash, uhash) {
         const args = [{
             type: "ByteArray",
             value: uhash
@@ -48,7 +47,7 @@ export default {
     },
 
      /**
-     * 获取TONT余额
+     * 获取TNT余额
      * @param {*} chash 合约hash
      * @param {*} uhash 用户hash - scriptHash
      */
