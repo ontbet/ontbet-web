@@ -117,7 +117,6 @@ export default {
               }
 
             }
-
               const msg = '充值失败';
               showMsg(msg)
             },

@@ -61,7 +61,7 @@ export default {
     }
   },
   methods: {
-    ...mapActions(['getBalance']),
+    ...mapActions(["getBalance"]),
     open() {
       this.value = 0;
       this.show = true;
@@ -113,27 +113,30 @@ export default {
                     // console.log("交易完成");
                     // console.log(res); //得到交易的状态，json里面有个notify
                     const notify = res.Notify;
-                    const successLength = notify.filter(item => {
-                      return (
-                        item.ContractAddress === this.contractHash &&
-                        item.States.filter(citem => citem === "73756363657373")
-                          .length
-                      );
-                    }).length;
-                    const errors = notify.filter(item => {
-                      return item.States.filter(citem => citem === "6572726f72")
-                        .length;
-                    });
-                    if (successLength) {
-                      showMsg(this.$t("message.withdrawSuccess"), "success");
-                      this.getBalance();
-                    } else {
-                      let msg = "提现失败";
-                      if (errors.length) {
-                        msg = $t("message.errorCode" + errors[0][1]);
+                    for (let i = 0; i < notify.length; i++) {
+                      if (notify[i].ContractAddress == this.contractHash) {
+                        let states = notify[i].States;
+
+                        if (states[0] == "73756363657373") {
+                          showMsg(
+                            this.$t("message.withdrawSuccess"),
+                            "success"
+                          );
+                          this.getBalance();
+
+                          return;
+                        }
+                        if (states[0] == "73756363657373") {
+                          msg = $t(
+                            "message.errorCode" + parseInt(states[1], 16)
+                          );
+                          showMsg(msg);
+                          return;
+                        }
                       }
-                      showMsg(msg);
                     }
+                    const msg = '提现失败';
+              showMsg(msg)
                   },
                   err => {
                     console.log(err); //这里可能是网络原因或者交易还没被执行，还没有结果会到这里。
@@ -143,13 +146,14 @@ export default {
           },
           err => {
             console.log(err);
-             if (err == "CANCELED") {
-          showMsg(this.$t('message.rechargeCanel'))
-        } else {
-          showMsg(this.$t('message.rechargeError'))
-        }
+            if (err == "CANCELED") {
+              showMsg(this.$t("message.rechargeCanel"));
+            } else {
+              showMsg(this.$t("message.rechargeError"));
+            }
           }
-        ).finally(() => this.close());
+        )
+        .finally(() => this.close());
     }
   }
 };
