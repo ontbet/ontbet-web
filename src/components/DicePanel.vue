@@ -221,6 +221,14 @@ export default {
       if (value > this.$config.game.targetMax) this.betting.target = this.$config.game.targetMax;
       if (value < this.$config.game.targetMin) this.betting.target = this.$config.game.targetMin;
     },
+    // 投注请求成功
+    gameRequestSuccess(txid) {
+      client.api.network.getSmartCodeEvent({ value: txid.toString() })
+      .then(
+        res => this.gameSuccess(res), 
+        err => this.gameFailure(err))
+      .catch(err => this.gameFailure(err))
+    },
     // 投注操作成功
     gameSuccess(data) {
       // 结束游戏
@@ -339,14 +347,7 @@ export default {
       client.api.smartContract
         .invoke(options)
         .then(
-          res => {
-            let txid = res["transaction"];
-            client.api.network.getSmartCodeEvent({ value: txid.toString() })
-            .then(
-              res2 => this.gameSuccess(res2), 
-              err => this.gameFailure(err))
-            .catch(err => this.gameFailure(err))
-          },
+          res => this.gameRequestSuccess(res["transaction"]),
           err => this.gameFailure(err))
         .catch(err => this.gameFailure(err));
     },
