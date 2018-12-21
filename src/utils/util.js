@@ -35,8 +35,6 @@ export function ReverHexNumberToNumber(hexnumber){
     let num = util.reverseHex(hexnumber)
    
     num = new BigNumber(num,16)
-
-    //console.log(num)
     return num
 }
 

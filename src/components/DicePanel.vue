@@ -4,25 +4,19 @@
     <withdraw-modal ref="withdrawModal"></withdraw-modal>
     <!-- 充值 -->
     <recharge-modal ref="rechargeModal"></recharge-modal>
-    <!-- 游戏结果modal -->
-    <el-dialog :title="$t('modal.gameResult')" :visible.sync="resultModal.show" width="30%">
-      <span>这是返回的结果信息</span>
-      <span slot="footer">
-        <el-button type="primary" @click="closeResultModal">{{$t('btn.ok')}}</el-button>
-      </span>
-    </el-dialog>
 
     <div class="dice-panel">
       <div class="dice-types">
         <el-button
-          v-for="(item, key) in currencys"
-          :key="key"
+          v-for="(item, key) in $config.currencys"
+          :key="item.code"
           :type="item.name === bcType ? 'primary' : ''"
           size="small"
+          v-if="item.enable"
           @click="changeBcType(key)"
         >{{item.name}}</el-button>
       </div>
-      <div class="dice-amount" v-if="currencys">
+      <div class="dice-amount" v-if="$config.currencys">
         <el-row :gutter="20">
           <el-col :span="16">
             <div class="dice-atr-title">{{$t('game.betting')}}({{bt.name}})</div>
@@ -63,7 +57,7 @@
             <div>
               <div class="dice-atr-title">{{$t('game.victoryCondition')}}</div>
               <span class="dice-count">
-                {{target}}
+                {{betting.target}}
                 <i class="el-icon-caret-bottom" style="color:red"></i>
               </span>
             </div>
@@ -77,7 +71,7 @@
           <el-col :span="8">
             <div>
               <div class="dice-atr-title">{{$t('game.probability')}}</div>
-              <span class="dice-count">{{target - 1}}%</span>
+              <span class="dice-count">{{betting.target - 1}}%</span>
             </div>
           </el-col>
         </el-row>
@@ -85,7 +79,8 @@
       <div class="dice-slide-wrap">
         <span>1</span>
         <div class="dice-slide">
-          <el-slider v-model="target" :max="100" :min="1" height="20" @change="changeTarget"></el-slider>
+          <el-slider v-model="betting.target" :max="100" :min="1" height="20" @change="changeTarget"></el-slider>
+          <div class="dice-result-number" v-show="result.show">{{result.number}}</div>
         </div>
         <span>100</span>
       </div>
@@ -119,9 +114,9 @@
             </div>
             <span
               slot="reference"
-            >{{$t('nav.balance')}}: {{balance[bcType]}} {{currencys[bcType].name}}</span>
+            >{{$t('nav.balance')}}: {{balance[bcType] | toFixed}} {{$config.currencys[bcType].name}}</span>
           </el-popover>
-          <span v-else style="flex: 1">{{$t('nav.balance')}}: {{balance[bcType]}} {{currencys[bcType].name}}</span>
+          <span v-else style="flex: 1">{{$t('nav.balance')}}: {{balance[bcType] | toFixed}} {{$config.currencys[bcType].name}}</span>
           <el-button
             :loading="game.status === 1"
             type="primary"
@@ -131,7 +126,7 @@
             <template v-if="game.status === 2">{{game.randomNumber}}</template>
             <template v-else>{{$t("btn.submit")}}</template>
           </el-button>
-          <span style="flex: 1">100 TNT</span>
+          <span style="flex: 1">{{balance['TNT'] | toFixed}} TNT</span>
         </template>
         <el-button v-else type="primary" @click="login">{{$t("btn.login")}}</el-button>
       </div>
@@ -143,7 +138,7 @@
 </template>
 
 <script>
-import { mapGetters } from "vuex";
+import { mapGetters, mapActions } from "vuex";
 import { client } from "ontology-dapi";
 import { toFixed, multiple, showMsg } from "@/utils/util";
 import dicePanelService from "@/services/dice-panel";
@@ -164,43 +159,51 @@ export default {
       multiples: dicePanelService.multiples,
       betting: {
         current: 0,
+        target: 50,
         max: 10000
-      },
-      target: 50,
-      resultModal: {
-        show: false
       },
       game: {
         // 游戏状态 0 关闭， 1 准备， 2 进行中
         status: 0,
         randomNumber: 0
       },
-      Address: ""
+      result: {
+        show: true,
+        number: 50
+      }
     };
+  },
+  watch: {
+    'game.status': function (value) {
+      if(value === 0) {
+        gameTimer = null;
+      } else {
+        this.setGameRandomNumber();
+      }
+    }
   },
   computed: {
     ...mapGetters([
-      "user",
       "balance",
       "loginStatus",
-      "contractHash",
-      "currencys",
       "bcType",
       "scriptHash"
     ]),
     // 倍数
     odds() {
-      return toFixed((100 - 2) / this.target);
+      return toFixed((100 - 2) / this.betting.target);
     },
     // 奖金
     bonus() {
       return toFixed(multiple([this.odds, this.betting.current || 0]));
     },
+    // 当前币
     bt() {
-      return this.currencys ? this.currencys[this.bcType] : {};
+      return this.$config.currencys ? this.$config.currencys[this.bcType] : {};
     }
   },
   methods: {
+    ...mapActions(['getBalance']),
     // 修改币种
     changeBcType(type) {
       dicePanelService.changeBcType(type);
@@ -215,8 +218,63 @@ export default {
     },
     // 监听目标点数
     changeTarget(value) {
-      if (value > 96) this.target = 96;
-      if (value < 2) this.target = 2;
+      if (value > this.$config.game.targetMax) this.betting.target = this.$config.game.targetMax;
+      if (value < this.$config.game.targetMin) this.betting.target = this.$config.game.targetMin;
+    },
+    // 投注操作成功
+    gameSuccess(data) {
+      // 结束游戏
+      this.game.status = 0;
+      const notify = data.Notify;
+      for (let i = 0; i < notify.length; i++) {
+        if (notify[i].ContractAddress === this.$config.contract.hash) {
+          const states = notify[i].States;
+          return this.gameEndAction(states[0], parseInt(states[5], 16), parseInt(states[6], 16));
+        }
+      }
+      return this.gameFailure();
+    },
+    // 投注操作失败
+    gameFailure(type) {
+      // 结束游戏
+      this.game.status = 0;
+      // 用户取消操作
+      if(type === 'CANCELED') {
+        showMsg(this.$t("message.gameCanel"));
+      }
+      // 其他错误 
+      else {
+        showMsg(this.$t("message.gameError"));
+      }
+    },
+    // 投注操作结束
+    gameEndAction(state, myNumber, sysNumber) {
+      // 投注成功
+      if(state === this.$config.game.successCode) {
+        this.result.number = sysNumber;
+        this.result.show = true;
+        myNumber > sysNumber ? this.gameWin(myNumber, sysNumber) : this.gameLose(myNumber, sysNumber);
+      } 
+      // 投注失败
+      else if (state === this.$config.game.errorCode) {
+        showMsg(state);
+      }
+    },
+    // 投注 - 赢
+    gameWin(myNumber, sysNumber) {
+      if(this.$i18n.locale === 'en') {
+        showMsg(`恭喜你，投注 ${myNumber} ${this.bcType},掷出 ${sysNumber}，获得奖励 ${this.betting.current * this.odds} ${this.bcType}`, 'success');
+      } else {
+        showMsg(`恭喜你，投注 ${myNumber} ${this.bcType},掷出 ${sysNumber}，获得奖励 ${this.betting.current * this.odds} ${this.bcType}`, 'success');
+      }
+    },
+    // 投注 - 输
+    gameLose(myNumber, sysNumber) {
+      if(this.$i18n.locale === 'en') {
+        showMsg(`投注 ${myNumber} ${this.bcType},掷出 ${sysNumber}，未能获得奖励`);
+      } else {
+        showMsg(`投注 ${myNumber} ${this.bcType},掷出 ${sysNumber}，未能获得奖励`, '');
+      }
     },
     // 投注
     async submit() {
@@ -227,129 +285,70 @@ export default {
             type: "warning"
           });
         }
-        // 接下来是走投注的流程
-        // 游戏准备中
+        // 游戏准备
         this.game.status = 1;
         // 游戏开始
         this.game.status = 2;
-        this.setGameRandomNumber();
+        // 调用投注方法
         this.guess(
           this.scriptHash,
-          btCode[this.bcType],
-          this.target,
+          this.$config.currencys[this.bcType].code,
+          this.betting.target,
           this.betting.current
         );
-        //this.game.status = 0;
-        //this.openResultModal();
       }
     },
     guess(
       fromUserScriptHash,
       tokentype,
       number,
-      amount,
-      inviterScriptHash = fromUserScriptHash
+      amount
     ) {
-      const MAX_NUMBER = 96;
-      const MIN_NUMBER = 2;
-
-      const TNT_DEGREE = 10000000000; //币种的精度，最好这里变成biginter来计算，免得JS不支持那么大的数计算,这里可以弄成全局变量
-      const ONG_DEGREE = 1000000000;
-      const TONT_DEGREE = 100000000;
 
       //把小数转换为整数，因为ONT区块链不支持小数，只能通过放大的方式来，实现小数
-      if (tokentype === btCode.ONT) {
-        //ONT不能投注，必须得充值转换为TONT，才能下注
-        return;
-      } else if (tokentype === btCode.TNT) {
-        amount = amount * TNT_DEGREE;
-      } else if (tokentype === btCode.TONT) {
-        amount = amount * TONT_DEGREE;
-      } else if (tokentype === btCode.ONG) {
-        amount = amount * ONG_DEGREE;
+      if(tokentype === this.$config.currencys['ONT'].code) {
+        showMsg('ONT不能投注，必须得充值转换为TONT，才能下注');
+        return this.game.status = 0;
       }
 
-      if (number < MIN_NUMBER || number > MAX_NUMBER) {
-        //核对一下，下注的范围，还要考虑一下，这里也不能是小数
-        return;
+      const _amount = amount * this.$config.degree[this.bcType];
+
+      //核对一下，下注的范围，还要考虑一下，这里也不能是小数
+      if (number < this.$config.game.targetMin || number > this.$config.game.targetMax) {
+        showMsg(this.$t('message.gameCurrentError'));
+        return this.game.status = 0;
       }
-      const scriptHash = this.contractHash; //合约的地址
-      const operation = "Guess"; //调用合约的方法名
+
+      const contract = this.$config.contract;
       const args = [
         { type: "ByteArray", value: fromUserScriptHash },
         { type: "Integer", value: tokentype },
         { type: "Integer", value: number },
-        { type: "Integer", value: amount },
-        { type: "ByteArray", value: inviterScriptHash }
-      ]; //合约的参数
-      const gasPrice = 500;
-      const gasLimit = 200000;
+        { type: "Integer", value: _amount },
+        { type: "ByteArray", value: fromUserScriptHash }
+      ];
+
+      const options = {
+        scriptHash: contract.hash,
+        operation: contract.operation,
+        args, 
+        gasPrice: contract.gasPrice,
+        gasLimit: contract.gasLimit
+      }
+
       client.api.smartContract
-        .invoke({
-          scriptHash,
-          operation,
-          args,
-          gasPrice,
-          gasLimit
-        })
+        .invoke(options)
         .then(
           res => {
-            console.log(res["transaction"]);
             let txid = res["transaction"];
-            client.api.network
-              .getSmartCodeEvent({ value: txid.toString() })
-              .then(
-                res2 => {
-                  console.log(res2);
-                  let notify = res2.Notify;
-                  //console.log(notify)
-                  for (let i = 0; i < notify.length; i++) {
-                    if (notify[i].ContractAddress == this.contractHash) {
-                      console.log(notify[i].States);
-                      let states = notify[i].States;
-                      if (states[0] == "6775657373") {
-                        let sysnumber = parseInt(states[6], 16);
-                        let mynumber = parseInt(states[5], 16);
-                        console.log(sysnumber);
-                        if (mynumber > sysnumber) {
-                          console.log("win");
-                        } else {
-                          console.log("lose");
-                        }
-                        this.game.status = 0;
-                        return;
-                      }
-
-                      if (states[0] == "6572726f72") {
-                        console.log("error");
-                        this.game.status = 0;
-                      }
-                    }
-                  }
-
-                  this.game.status = 0;
-                },
-                err => {
-                  console.log(err);
-                  this.game.status = 0;
-                }
-              );
+            client.api.network.getSmartCodeEvent({ value: txid.toString() })
+            .then(
+              res2 => this.gameSuccess(res2), 
+              err => this.gameFailure(err))
+            .catch(err => this.gameFailure(err))
           },
-          err => {
-            if (err == "CANCELED") {
-              showMsg(this.$t("message.rechargeCanel"));
-            } else {
-              showMsg(this.$t("message.rechargeError")); //这里要改一下
-            }
-            this.game.status = 0;
-          }
-        ); //向区块链节点发送该交易，会返回该次交易的hash
-    },
-    openResultModal() {
-      this.resultModal.show = true;
-    },
-    closeResultModal() {
-      this.resultModal.show = false;
+          err => this.gameFailure(err))
+        .catch(err => this.gameFailure(err));
     },
     setGameRandomNumber() {
       clearTimeout(gameTimer);
@@ -456,8 +455,14 @@ export default {
   }
 }
 .dice-slide {
+  position: relative;
   width: 0;
   flex: 1;
+}
+.dice-result-number {
+  position: absolute;
+  top: 0;
+  left: 0;
 }
 .dice-user {
   padding: 10px 0;

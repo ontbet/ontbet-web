@@ -1,7 +1,5 @@
 <template>
     <div class="nav-header">
-        <span>{{user.name}}</span>
-        <span>{{$i18n.locale}}</span>
         <div class="logo">
             <img :src="logo" alt="LOGO">
         </div>
@@ -12,19 +10,6 @@
             <li class="nav-menu-item" @click="openModal('invite')" v-if="loginStatus">{{$t('nav.invite')}}</li>
             <li class="nav-menu-item" @click="openModal('help')">{{$t('nav.help')}}</li>
         </ul>
-        <!-- <el-popover
-            v-if="loginStatus"
-            placement="bottom"
-            width="200"
-            trigger="hover">
-            <div>
-                <el-row :gutter="15">
-                    <el-col :span="12"><el-button type="success" style="width: 100%" @click="openModal('recharge')">{{$t('btn.recharge')}}</el-button></el-col>
-                    <el-col :span="12"><el-button type="primary" style="width: 100%" @click="openModal('withdraw')">{{$t('btn.withdraw')}}</el-button></el-col>
-                </el-row>
-            </div>
-            <span slot="reference" class="balance-btn">{{$t('nav.balance')}}: {{balance[bcType]}} {{currencys[bcType].name}}</span>
-        </el-popover> -->
         <el-dropdown>
             <span class="language-btn">
                 {{$t('lang')}}<i class="el-icon-arrow-down el-icon--right"></i>
@@ -57,12 +42,9 @@ export default {
     },
     computed: {
         ...mapGetters([
-            'user',
             'balance',
             'loginStatus',
-            'bcType',
-            'currencys',
-            'loginStatus'
+            'bcType'
         ]),
     }
 }

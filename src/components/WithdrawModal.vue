@@ -50,11 +50,9 @@ export default {
       "account",
       "address",
       "scriptHash",
-      "contractHash",
       "balance",
       "loginStatus",
-      "bcType",
-      "currencys"
+      "bcType"
     ]),
     result() {
       return (this.value || 0) * 1;
@@ -87,7 +85,7 @@ export default {
     },
 
     withdraw(formUser, amount) {
-      const scriptHash = this.contractHash; //合约的地址
+      const scriptHash = this.$config.contract.hash; //合约的地址
       const operation = "Withdraw"; //调用合约的方法名
       const args = [
         { type: "ByteArray", value: formUser },
@@ -114,16 +112,12 @@ export default {
                     // console.log(res); //得到交易的状态，json里面有个notify
                     const notify = res.Notify;
                     for (let i = 0; i < notify.length; i++) {
-                      if (notify[i].ContractAddress == this.contractHash) {
+                      if (notify[i].ContractAddress == this.$config.contract.hash) {
                         let states = notify[i].States;
 
                         if (states[0] == "73756363657373") {
-                          showMsg(
-                            this.$t("message.withdrawSuccess"),
-                            "success"
-                          );
+                          showMsg( this.$t("message.withdrawSuccess"), "success");
                           this.getBalance();
-
                           return;
                         }
                         if (states[0] == "73756363657373") {

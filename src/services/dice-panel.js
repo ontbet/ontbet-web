@@ -24,24 +24,6 @@ export default {
     }
   ],
 
-  // 币种
-  currencys: [{
-    name: 'TONT',
-    min: 0.1,
-    max: 10000
-  },
-    {
-      name: 'ONG',
-      min: 0.1,
-      max: 10000
-    },
-    {
-      name: 'TNT',
-      min: 10,
-      max: 10000
-    }
-  ],
-
   /**
    * 计算投注金额
    * @param {*} current 当前值
@@ -82,11 +64,7 @@ export default {
       store.commit(BT_TYPE, type)
     }
   },
-
-
-
-
-
+  
 //这个是下注竞猜方法，参数1：当前用户的hash，参数2：下注用的那个币种类型（枚举类型）,参数3：下注数字，参数4:下注的多少，参数5:邀请人的hash（来自url，如果没有可以内置一个）
   async guess(
       fromUserScriptHash,

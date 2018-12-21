@@ -2,14 +2,10 @@ import Vue from 'vue'
 import Vuex from 'vuex'
 import userService from '@/services/user'
 import { ReverHexNumberToNumber } from '@/utils/util'
-import config from '../config'
 import {
   LOGIN_STATUS,
-  USER,
   BALANCE,
   BT_TYPE,
-  CURRENCYS,
-  CONTRACT_HASH,
   ADDRESS,
   SCRIPT_HASH,
   EMPTY_USER,
@@ -20,22 +16,12 @@ import {
 
 Vue.use(Vuex)
 
-console.log(config)
-
 export default new Vuex.Store({
     state: {
         loginStatus: false,
-        user: {
-            name: '张三',
-            address: '64f75b59554a2008bcc1a87a7ae09249abc74a91',
-            scriptHash: '95feeda3a7f41e43204353de64aa7b016e4ffaa3'
-        },
         account: '',
         address: '',
         scriptHash: '',
-        // 合约hash
-        contractHash: config.contractHash,
-        TNTcontractHash: config.TNTcontractHash,
         balance: {
             'TONT': 0,
             'ONG': 0,
@@ -43,32 +29,10 @@ export default new Vuex.Store({
         },
         // 币种类型
         bcType: 'TONT',
-        // 币种合集
-        currencys: {
-            'TONT': {
-                name: 'TONT',
-                min: 1,
-                max: 100,
-                degree: 100000000
-            },
-            'ONG': {
-                name: 'ONG',
-                min: 1,
-                max: 100
-            },
-            'TNT': {
-                name: 'TNT',
-                min: 10,
-                max: 10000
-            }
-        }
     },
     mutations: {
         [LOGIN_STATUS](state, data) {
             state.loginStatus = data;
-        },
-        [USER](state, data) {
-            state.user = data;
         },
         [ACCOUNT](state, payload) {
             state.account = payload.account;
@@ -80,16 +44,13 @@ export default new Vuex.Store({
             state.scriptHash = payload.scriptHash;
         },
         [BALANCE](state, data) {
-            Object.assign(state.balance, data);
+            Object.assign(state.balance, {
+                ONG: Number(data.ONG),
+                ONT: Number(data.ONT)
+            });
         },
         [BT_TYPE](state, data) {
             state.bcType = data;
-        },
-        [CURRENCYS](state, data) {
-            state.currencys = data;
-        },
-        [CONTRACT_HASH](state, data) {
-            state.contractHash = data;
         },
         [EMPTY_USER](state) {
             state.loginStatus = false;
@@ -144,12 +105,12 @@ export default new Vuex.Store({
                 commit(BALANCE, {'ONG': 0, 'ONT': 0})
             });
         },
-        // 获取Tont的余额
+        // 获取ONT的余额
         getTONT({
             commit,
             state
         }) {
-            userService.getTONT(state.contractHash, state.scriptHash).then(res => {
+            userService.getTONT(config.contract.hash, state.scriptHash).then(res => {
                 let tontbanlance = ReverHexNumberToNumber(res)
                 tontbanlance = tontbanlance.div(100000000)
                 tontbanlance = Number(tontbanlance.toString(10))
@@ -163,7 +124,7 @@ export default new Vuex.Store({
             commit,
             state
         }) {
-            userService.getTNT(state.TNTcontractHash, state.scriptHash).then(res => {
+            userService.getTNT(config.contract.hash, state.scriptHash).then(res => {
                 let tntbanlance = ReverHexNumberToNumber(res)
                 tntbanlance = tntbanlance.div(100000000)
                 tntbanlance = Number(tntbanlance.toString(10))
@@ -180,9 +141,6 @@ export default new Vuex.Store({
         address: state => state.address,
         scriptHash: state => state.scriptHash,
         balance: state => state.balance,
-        bcType: state => state.bcType,
-        currencys: state => state.currencys,
-        contractHash: state => state.contractHash,
-        domain: () => config.domain
+        bcType: state => state.bcType
     }
 })

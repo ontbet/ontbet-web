@@ -44,11 +44,9 @@ export default {
       "account",
       "address",
       "scriptHash",
-      "contractHash",
       "balance",
       "loginStatus",
-      "bcType",
-      "currencys"
+      "bcType"
     ]),
     result() {
       return (this.value || 0) * 1;
@@ -75,7 +73,7 @@ export default {
     recharge(from, to, amount) {
       //付款账户，充值给谁，充值的个数，需要修改，不能跑完成吧，需要容错处理和健壮性
       //这里可以来一些检测，如账户的检测，是否都为20长度的字符串
-      const scriptHash = this.contractHash
+      const scriptHash = this.$config.contract.hash
       const gasPrice = 500;
       const gasLimit = 200000;
       const operation = "Recharge"; //调用合约的方法名
@@ -100,22 +98,20 @@ export default {
               let notify = res.Notify;
 
               for(let i = 0;i < notify.length;i++){
-            if(notify[i].ContractAddress == this.contractHash){
+            if(notify[i].ContractAddress == this.$config.contract.hash){
               let states = notify[i].States
 
               if(states[0] == '73756363657373'){
+                this.getBalance();
                 showMsg(this.$t('message.rechargeSuccess'), 'success')
                 return
               }
               if(states[0] == '73756363657373'){
-
                  msg = $t('message.errorCode' + parseInt(states[1],16))
                  showMsg(msg)
                  return
               }
-
               }
-
             }
               const msg = '充值失败';
               showMsg(msg)

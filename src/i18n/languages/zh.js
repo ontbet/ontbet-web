@@ -60,6 +60,11 @@ export default {
         'errorCode04': '账户余额不足',
         'errorCode05': '提取TONT出错，提取数量必须为整数',
         'errorCode06': '认证失败',
+        'copySuccess': '复制成功',
+        'copyError': '复制失败，请手动复制',
+        'gameCanel': '已取消投注',
+        'gameError': '投注发生错误',
+        'gameCurrentError': '投注金额不合法'
     },
     btn: {
         login: '登录',

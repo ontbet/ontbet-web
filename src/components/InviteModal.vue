@@ -2,10 +2,13 @@
   <el-dialog :title="$t('modal.invite')" width="600px" :visible.sync="show">
     <el-row :gutter="15">
       <el-col :span="20">
-        <el-input v-model="link" placeholder="邀请地址"></el-input>
+        <el-input v-model="link" placeholder="邀请地址" ref="link"></el-input>
       </el-col>
       <el-col :span="4">
-        <el-button type="primary" style="width: 100%">{{$t('copy')}}</el-button>
+        <el-button type="primary" style="width: 100%"
+          v-clipboard:copy="link"
+          v-clipboard:success="onCopySuccess"
+          v-clipboard:error="onCopyError">{{$t('copy')}}</el-button>
       </el-col>
     </el-row>
   </el-dialog>
@@ -13,6 +16,7 @@
 
 <script>
 import { mapGetters } from 'vuex'
+import { showMsg } from '@/utils/util'
 
 export default {
   data() {
@@ -21,9 +25,9 @@ export default {
     };
   },
   computed: {
-    ...mapGetters(['domain', 'address']),
+    ...mapGetters(['address']),
     link() {
-      return `${this.domain}?ref=${this.address}`;
+      return `http://${window.location.host}?ref=${this.address}`;
     }
   },
   methods: {
@@ -32,6 +36,12 @@ export default {
     },
     close() {
       this.show = close;
+    },
+    onCopySuccess(e) {
+      showMsg(this.$t('message.copySuccess'))
+    },
+    onCopyError() {
+      showMsg(this.$t('message.copyError'))
     }
   }
 };
