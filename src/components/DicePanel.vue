@@ -234,7 +234,6 @@ export default {
     },
     // 投注操作成功
     gameSuccess(data) {
-      console.log('操作成功')
       // 结束游戏
       this.game.status = 0;
       const notify = data.Notify;
@@ -263,6 +262,8 @@ export default {
     gameEndAction(states, myNumber, sysNumber) {
       // 投注成功
       if(states[0] === this.$config.game.successCode) {
+        // 更新余额
+        this.getBalance();
         this.setResult(sysNumber);
         myNumber > sysNumber ? this.gameWin(sysNumber) : this.gameLose(sysNumber);
       } 
