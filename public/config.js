@@ -11,7 +11,7 @@ const config = {
         targetMax: 96
     },
     contract: {
-        hash: '20990490514079dd5e99be3c9ac929a5413af0e6',
+        hash: '55c494d57ac7cbaad565b5e19ea757dcfe315e29',
         gasPrice: 500,
         gasLimit: 200000,
         operation: 'Guess'
@@ -40,7 +40,7 @@ const config = {
             max: 10000,
             code: 3,
             enable: true,
-            contractHash: '20990490514079dd5e99be3c9ac929a5413af0e6'
+            contractHash: '49f0908f08b3ebce1e71dc5083cb9a8a54cc4a24'
         },
         'ONT': {
             name: 'ONT',

@@ -114,6 +114,7 @@ export default new Vuex.Store({
                 let tontbanlance = ReverHexNumberToNumber(res)
                 tontbanlance = tontbanlance.div(100000000)
                 tontbanlance = Number(tontbanlance.toString(10))
+               
                 commit(TONT, tontbanlance)
             }).catch(err => {
                 commit(TONT, 0)
@@ -124,10 +125,11 @@ export default new Vuex.Store({
             commit,
             state
         }) {
-            userService.getTNT(config.contract.hash, state.scriptHash).then(res => {
+            userService.getTNT(config.currencys['TNT'].contractHash, state.scriptHash).then(res => {
                 let tntbanlance = ReverHexNumberToNumber(res)
                 tntbanlance = tntbanlance.div(100000000)
                 tntbanlance = Number(tntbanlance.toString(10))
+                console.log(tntbanlance)
                 commit(TNT, tntbanlance)
             }).catch(err => {
                 commit(TNT, 0)

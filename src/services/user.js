@@ -58,7 +58,7 @@ export default {
         }];
         const result = await client.api.smartContract.invokeRead({
             scriptHash: chash,
-            operation: 'banlanceof',
+            operation: 'balanceOf',
             args
         }); //得到banlanceTONT返回的调用结果，结果返回的是一个hexstring的int，需要转换一下。
         return result;
