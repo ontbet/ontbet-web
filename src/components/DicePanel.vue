@@ -78,9 +78,9 @@
       </div>
       <div class="dice-slide-wrap">
         <span>1</span>
-        <div class="dice-slide">
+        <div class="dice-slide" ref="slideWrap">
           <el-slider v-model="betting.target" :max="100" :min="1" height="20" @change="changeTarget"></el-slider>
-          <div class="dice-result-number" v-show="result.show">{{result.number}}</div>
+          <div class="dice-result-number" :class="{failure: result.lose}" :style="{left: result.left}" v-show="result.show" ref="result">{{result.number}}</div>
         </div>
         <span>100</span>
       </div>
@@ -169,7 +169,9 @@ export default {
       },
       result: {
         show: true,
-        number: 50
+        lose: false,
+        number: 50,
+        left: '0'
       }
     };
   },
@@ -218,6 +220,7 @@ export default {
     },
     // 监听目标点数
     changeTarget(value) {
+      this.result.show = false;
       if (value > this.$config.game.targetMax) this.betting.target = this.$config.game.targetMax;
       if (value < this.$config.game.targetMin) this.betting.target = this.$config.game.targetMin;
     },
@@ -259,9 +262,8 @@ export default {
     gameEndAction(state, myNumber, sysNumber) {
       // 投注成功
       if(state === this.$config.game.successCode) {
-        this.result.number = sysNumber;
-        this.result.show = true;
-        myNumber > sysNumber ? this.gameWin(myNumber, sysNumber) : this.gameLose(myNumber, sysNumber);
+        this.setResult(sysNumber);
+        myNumber > sysNumber ? this.gameWin(sysNumber) : this.gameLose(sysNumber);
       } 
       // 投注失败
       else if (state === this.$config.game.errorCode) {
@@ -269,20 +271,30 @@ export default {
       }
     },
     // 投注 - 赢
-    gameWin(myNumber, sysNumber) {
+    gameWin(sysNumber) {
+      this.result.lose = false;
       if(this.$i18n.locale === 'en') {
-        showMsg(`恭喜你，投注 ${myNumber} ${this.bcType},掷出 ${sysNumber}，获得奖励 ${this.betting.current * this.odds} ${this.bcType}`, 'success');
+        showMsg(`恭喜你，投注 ${this.betting.current} ${this.bcType}，掷出 ${sysNumber}，获得奖励 ${this.betting.current * this.odds} ${this.bcType}`, 'success');
       } else {
-        showMsg(`恭喜你，投注 ${myNumber} ${this.bcType},掷出 ${sysNumber}，获得奖励 ${this.betting.current * this.odds} ${this.bcType}`, 'success');
+        showMsg(`恭喜你，投注 ${this.betting.current} ${this.bcType}，掷出 ${sysNumber}，获得奖励 ${this.betting.current * this.odds} ${this.bcType}`, 'success');
       }
     },
     // 投注 - 输
-    gameLose(myNumber, sysNumber) {
+    gameLose(sysNumber) {
+      this.result.lose = true;
       if(this.$i18n.locale === 'en') {
-        showMsg(`投注 ${myNumber} ${this.bcType},掷出 ${sysNumber}，未能获得奖励`);
+        showMsg(`投注 ${this.betting.current} ${this.bcType}，掷出 ${sysNumber}，未能获得奖励`);
       } else {
-        showMsg(`投注 ${myNumber} ${this.bcType},掷出 ${sysNumber}，未能获得奖励`, '');
+        showMsg(`投注 ${this.betting.current} ${this.bcType}，掷出 ${sysNumber}，未能获得奖励`, '');
       }
+    },
+    // 设置系统点数
+    setResult(number) {
+      this.result.number = number;
+      this.result.show = true;
+      this.$nextTick(() => {
+        this.result.left = (number / 100 * this.$refs.slideWrap.offsetWidth) - (this.$refs.result.offsetWidth / 2) - 2 + 'px';
+      })
     },
     // 投注
     async submit() {
@@ -462,8 +474,29 @@ export default {
 }
 .dice-result-number {
   position: absolute;
-  top: 0;
+  padding: 10px;
+  top: 38px;
   left: 0;
+  background-color: #67c23a;
+  border-radius: 4px;
+  font-weight: bold;
+  &:after {
+    position: absolute;
+    content: '';
+    width: 10px;
+    height: 10px;
+    margin-left: 50%;
+    top: -5px;
+    left: -5px;
+    background-color: #67c23a;
+    transform: rotate(45deg);
+  }
+  &.failure {
+    background-color: #f56c6c;
+    &:after {
+      background-color: #f56c6c;
+    }
+  }
 }
 .dice-user {
   padding: 10px 0;
