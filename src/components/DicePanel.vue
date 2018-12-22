@@ -168,7 +168,7 @@ export default {
         randomNumber: 0
       },
       result: {
-        show: true,
+        show: false,
         lose: false,
         number: 50,
         left: '0'
@@ -234,13 +234,14 @@ export default {
     },
     // 投注操作成功
     gameSuccess(data) {
+      console.log('操作成功')
       // 结束游戏
       this.game.status = 0;
       const notify = data.Notify;
       for (let i = 0; i < notify.length; i++) {
         if (notify[i].ContractAddress === this.$config.contract.hash) {
           const states = notify[i].States;
-          return this.gameEndAction(states[0], parseInt(states[5], 16), parseInt(states[6], 16));
+          return this.gameEndAction(states, parseInt(states[5], 16), parseInt(states[6], 16));
         }
       }
       return this.gameFailure();
@@ -259,15 +260,15 @@ export default {
       }
     },
     // 投注操作结束
-    gameEndAction(state, myNumber, sysNumber) {
+    gameEndAction(states, myNumber, sysNumber) {
       // 投注成功
-      if(state === this.$config.game.successCode) {
+      if(states[0] === this.$config.game.successCode) {
         this.setResult(sysNumber);
         myNumber > sysNumber ? this.gameWin(sysNumber) : this.gameLose(sysNumber);
       } 
       // 投注失败
-      else if (state === this.$config.game.errorCode) {
-        showMsg(state);
+      else if (states[0] === this.$config.game.errorCode) {
+        showMsg(states[1]);
       }
     },
     // 投注 - 赢
@@ -475,7 +476,7 @@ export default {
 .dice-result-number {
   position: absolute;
   padding: 10px;
-  top: 38px;
+  top: -34px;
   left: 0;
   background-color: #67c23a;
   border-radius: 4px;
@@ -486,7 +487,7 @@ export default {
     width: 10px;
     height: 10px;
     margin-left: 50%;
-    top: -5px;
+    bottom: -5px;
     left: -5px;
     background-color: #67c23a;
     transform: rotate(45deg);

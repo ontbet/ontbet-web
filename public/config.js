@@ -6,7 +6,7 @@ const config = {
     },
     game: {
         successCode: '6775657373',
-        errCode: '6572726f72',
+        errorCode: '6572726f72',
         targetMin: 2,
         targetMax: 96
     },
