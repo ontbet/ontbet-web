@@ -230,7 +230,7 @@ export default {
       .then(
         res => this.gameSuccess(res), 
         err => this.gameFailure(err))
-      .catch(err => this.gameFailure(err))
+      // .catch(err => this.gameFailure(err))
     },
     // 投注操作成功
     gameSuccess(data) {
@@ -269,7 +269,7 @@ export default {
       } 
       // 投注失败
       else if (states[0] === this.$config.game.errorCode) {
-        showMsg(states[1]);
+        showMsg(this.$t(`message.errorCode${states[1]}`));
       }
     },
     // 投注 - 赢
