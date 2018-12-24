@@ -319,7 +319,8 @@ export default {
           this.scriptHash,
           this.$config.currencys[this.bcType].code,
           this.betting.target,
-          this.betting.current
+          this.betting.current,
+          this.inviterScriptHash
         );
       }
     },
@@ -327,7 +328,8 @@ export default {
       fromUserScriptHash,
       tokentype,
       number,
-      amount
+      amount,
+      inviterScriptHash
     ) {
 
       if(this.balance[this.bcType] < this.betting.current) { 
@@ -355,7 +357,7 @@ export default {
         { type: "Integer", value: tokentype },
         { type: "Integer", value: number },
         { type: "Integer", value: _amount },
-        { type: "ByteArray", value: fromUserScriptHash }
+        { type: "ByteArray", value: inviterScriptHash }
       ];
 
       const options = {
