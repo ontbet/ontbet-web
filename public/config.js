@@ -27,7 +27,8 @@ const config = {
             degree: 100000000,
             code: 4,
             enable: true,
-            contractHash: '20990490514079dd5e99be3c9ac929a5413af0e6'
+            contractHash: '20990490514079dd5e99be3c9ac929a5413af0e6',
+            rewardMultiple: 20
         },
         'ONG': {
             name: 'ONG',
@@ -35,7 +36,8 @@ const config = {
             max: 100,
             code: 1,
             enable: true,
-            contractHash: ''
+            contractHash: '',
+            rewardMultiple: 10
         },
         'TNT': {
             name: 'TNT',
@@ -43,7 +45,8 @@ const config = {
             max: 10000,
             code: 3,
             enable: true,
-            contractHash: '49f0908f08b3ebce1e71dc5083cb9a8a54cc4a24'
+            contractHash: '49f0908f08b3ebce1e71dc5083cb9a8a54cc4a24',
+            rewardMultiple: 0
         },
         'ONT': {
             name: 'ONT',
@@ -51,7 +54,8 @@ const config = {
             max: 10000,
             code: 2,
             enable: false,
-            contractHash: ''
+            contractHash: '',
+            rewardMultiple: 0
         }
     },
     currencyCodes: {

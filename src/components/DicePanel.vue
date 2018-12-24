@@ -131,7 +131,9 @@
         <el-button v-else type="primary" @click="login">{{$t("btn.login")}}</el-button>
       </div>
       <div class="dice-remark">
-        <span>{{$t('message.dice')}}</span>
+        <span>
+          {{`${$t('message.dice')}${betting.current * $config.currencys[bcType].rewardMultiple}TNT`}}
+        </span>
       </div>
     </div>
   </div>
@@ -189,7 +191,8 @@ export default {
       "balance",
       "loginStatus",
       "bcType",
-      "scriptHash"
+      "scriptHash",
+      'inviterScriptHash'
     ]),
     // 倍数
     odds() {

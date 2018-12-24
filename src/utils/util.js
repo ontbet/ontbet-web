@@ -1,5 +1,7 @@
 import mathjs from 'mathjs'
-import { Message } from 'element-ui'
+import {
+    Message
+} from 'element-ui'
 let Ont = require('ontology-ts-sdk');
 /**
  * 四舍五入
@@ -29,18 +31,30 @@ export function showMsg(msg = '无内容', type = 'warring') {
     })
 }
 
-export function ReverHexNumberToNumber(hexnumber){
+export function ReverHexNumberToNumber(hexnumber) {
     let BigNumber = require('bignumber.js');
     let util = Ont.utils
     let num = util.reverseHex(hexnumber)
-   
-    num = new BigNumber(num,16)
+
+    num = new BigNumber(num, 16)
     return num
 }
 
 
-export function sleep(time){
+export function sleep(time) {
     return new Promise(((resolve) => {
         window.setTimeout(resolve, time);
     }))
+}
+
+/**
+ * 验证地址
+ * @param {*} address 
+ */
+export function verifiAddress(hash) {
+    try {
+        return hash && hash.length === 20 ? true : false;
+    } catch (err) {
+        return false;
+    }
 }

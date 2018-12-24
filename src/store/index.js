@@ -1,7 +1,7 @@
 import Vue from 'vue'
 import Vuex from 'vuex'
 import userService from '@/services/user'
-import { ReverHexNumberToNumber } from '@/utils/util'
+import { ReverHexNumberToNumber, verifiAddress } from '@/utils/util'
 import {
   LOGIN_STATUS,
   BALANCE,
@@ -11,7 +11,8 @@ import {
   EMPTY_USER,
   ACCOUNT,
   TONT,
-  TNT
+  TNT,
+  INVITER_SCRIPTHASH
 } from './types'
 
 Vue.use(Vuex)
@@ -22,6 +23,8 @@ export default new Vuex.Store({
         account: '',
         address: '',
         scriptHash: '',
+        // 邀请人scripthash
+        inviterScriptHash: '',
         balance: {
             'TONT': 0,
             'ONG': 0,
@@ -68,8 +71,11 @@ export default new Vuex.Store({
         },
         [TNT](state, data = 0) {
             state.balance['TNT'] = data;
+        },
+        [INVITER_SCRIPTHASH](state, data = '') {
+            console.log(data);
+            state.inviterScriptHash = data;
         }
-
     },
     actions: {
         getAccount({
@@ -141,6 +147,7 @@ export default new Vuex.Store({
         address: state => state.address,
         scriptHash: state => state.scriptHash,
         balance: state => state.balance,
-        bcType: state => state.bcType
+        bcType: state => state.bcType,
+        inviterScriptHash: state => state.inviterScriptHash || state.scriptHash
     }
 })

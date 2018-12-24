@@ -49,7 +49,7 @@ export default {
         'hello': '你好',
         'rechargeNull': '充值额度不能小于1',
         'withdrawNull': '提现额度不能小于1',
-        'dice': '下注可获得10 TNT',
+        'dice': '下注可获得',
         'rechargeCanel': '已取消充值',
         'rechargeSuccess': '充值成功',
         'rechargeError': '充值失败',
