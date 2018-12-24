@@ -327,6 +327,11 @@ export default {
       amount
     ) {
 
+      if(this.balance[this.bcType] < this.betting.current) { 
+        showMsg(this.$t('message.errorCode04'));
+        return this.game.status = 0;
+      }
+
       //把小数转换为整数，因为ONT区块链不支持小数，只能通过放大的方式来，实现小数
       if(tokentype === this.$config.currencys['ONT'].code) {
         showMsg('ONT不能投注，必须得充值转换为TONT，才能下注');
