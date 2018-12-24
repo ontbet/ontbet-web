@@ -48,7 +48,7 @@ export default {
 
 <style lang="less">
   .main {
-    
+    margin-bottom: 100px;
   }
   #nav {
     position: fixed;

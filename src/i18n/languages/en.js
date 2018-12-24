@@ -31,11 +31,13 @@ export default {
     },
     table: {
         time: 'Time',
+        game: 'game',
         betsPeople: 'Bettor',
         victoryCondition: 'Roll Under',
         betting: 'Bet',
         number: ' Roll',
-        bonus: 'Payout'
+        bonus: 'Payout',
+        type: 'tokentype'
     },
     help: {
         content: [

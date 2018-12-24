@@ -128,7 +128,6 @@ export default new Vuex.Store({
                 let tntbanlance = ReverHexNumberToNumber(res)
                 tntbanlance = tntbanlance.div(100000000)
                 tntbanlance = Number(tntbanlance.toString(10))
-                console.log(tntbanlance)
                 commit(TNT, tntbanlance)
             }).catch(err => {
                 commit(TNT, 0)

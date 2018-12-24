@@ -7,7 +7,7 @@ import axios from 'axios'
 const http = axios.create({
     // 请求超时时间
     timeout: 10000,
-    baseURL: '域名'
+    baseURL: config.baseUrl
 })
 
 http.interceptors.request.use(

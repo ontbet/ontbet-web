@@ -31,11 +31,13 @@ export default {
     },
     table: {
         time: '时间',
+        game: '场次',
         betsPeople: '投注者',
         victoryCondition: '小于该号码获胜',
         betting: '投注',
         number: ' 开奖号码',
-        bonus: '奖金'
+        bonus: '奖金',
+        type: '币种'
     },
     help: {
         content: [

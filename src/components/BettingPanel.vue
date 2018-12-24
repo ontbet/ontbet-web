@@ -2,16 +2,17 @@
     <div class="betting-wrap">
         <div class="betting-panel">
             <div class="bp-tab">
-                <div class="bp-tab-item" v-for="(item, index) in tab.navs" :key="item.name" :class="{active: index === tab.current}" @click="switchTab(index)">{{$t(item.text)}}</div>
+                <div class="bp-tab-item" v-for="(item, index) in navs" :key="item.name" :class="{active: index === tab.current}" @click="switchTab(index)">{{$t(item.text)}}</div>
             </div>
             <div class="bp-content">
-                <component :is="tab.navs[tab.current].component"></component>
+                <component :is="navs[tab.current].component"></component>
             </div>
         </div>
     </div>
 </template>
 
 <script>
+import { mapGetters } from 'vuex'
 import AllBets from './AllBets'
 import MineBets from './MineBets'
 
@@ -28,13 +29,35 @@ export default {
                     {
                         component: 'AllBets',
                         text: 'tab.allBets'
-                    },
-                    {
-                        component: 'MineBets',
-                        text: 'tab.mineBets'
                     }
                 ]
             }
+        }
+    },
+    mounted() {
+        if(this.loginStatus) {
+            this.tab.navs.push({
+                component: 'MineBets',
+                text: 'tab.mineBets'
+            })
+        }
+    },
+    computed: {
+        ...mapGetters(['loginStatus']),
+        navs() {
+            let temp = [
+                {
+                    component: 'AllBets',
+                    text: 'tab.allBets'
+                }
+            ]
+            if(this.loginStatus) {
+                temp.push({
+                    component: 'MineBets',
+                    text: 'tab.mineBets'
+                })
+            }
+            return temp;
         }
     },
     methods: {

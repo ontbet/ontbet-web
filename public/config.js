@@ -1,4 +1,7 @@
 const config = {
+    baseUrl: 'http://66.42.33.2:8000',
+    // 投注记录刷新时间
+    interval: 1000,
     degree: {
         TNT: 10000000000,
         ONG: 1000000000,
@@ -50,5 +53,11 @@ const config = {
             enable: false,
             contractHash: ''
         }
+    },
+    currencyCodes: {
+        4: 'TONT',
+        3: 'TNT',
+        2: 'ONT',
+        1: 'ONG'
     }
 }
