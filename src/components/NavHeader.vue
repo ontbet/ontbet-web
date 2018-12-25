@@ -9,6 +9,7 @@
             <li class="nav-menu-item" @click="openModal('dividend')">{{$t('nav.dividend')}}</li>
             <li class="nav-menu-item" @click="openModal('invite')" v-if="loginStatus">{{$t('nav.invite')}}</li>
             <li class="nav-menu-item" @click="openModal('help')">{{$t('nav.help')}}</li>
+            <li class="nav-menu-item" v-if="loginStatus">{{address}}</li>
         </ul>
         <el-dropdown>
             <span class="language-btn">
@@ -42,6 +43,7 @@ export default {
     },
     computed: {
         ...mapGetters([
+            'address',
             'balance',
             'loginStatus',
             'bcType'
